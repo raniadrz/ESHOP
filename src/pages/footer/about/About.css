@@ -1,0 +1,26 @@
+.About-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .About-container h1 {
+    font-size: 2rem;
+    color: #549aa5;
+    margin-bottom: 20px;
+  }
+  
+  .About-container p {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #666;
+    margin-bottom: 15px;
+  }
+  
+  /* Media query for responsiveness */
+  @media (max-width: 768px) {
+    .About-container {
+      padding: 20px 10px;
+    }
+  }
+  

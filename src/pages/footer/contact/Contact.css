@@ -1,0 +1,38 @@
+.Contact-container {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .Contact-map {
+    flex: 1;
+    margin-right: 20px;
+  }
+  
+  .Contact-map img {
+    max-width: 100%;
+  }
+  
+  .contact-info {
+    margin-top: 20px;
+  }
+  
+  .Contact-details {
+    flex: 1;
+  }
+  
+  /* Media query to make the layout responsive */
+  @media (max-width: 768px) {
+    .Contact-container {
+      flex-direction: column;
+    }
+  
+    .Contact-details {
+      margin-right: 0;
+    }
+    .Contact-map img {
+      margin-right: 0;
+      width: 80%; /* Adjust the width as needed */
+      height: auto; /* Maintain aspect ratio */
+    }
+  }
+  

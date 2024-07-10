@@ -1,0 +1,29 @@
+/* Navbar.css */
+
+/* Drawer styles */
+.drawer-list {
+  background-color: #2d68b1; /* Light grey background */
+  height: 100%;
+  width: 250px; /* Width of the side nav */
+}
+
+/* List item styles */
+.MuiListItem-root {
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  text-align: center; /* Center text */
+}
+
+/* List item text styles */
+.MuiListItemText-root {
+  text-align: center; /* Center the text */
+}
+
+/* Nested list styles */
+.nested-list {
+  padding-left: 20px; /* Indentation for nested items */
+}
+
+/* Specific styles for the user options icon */
+.user-options-icon {
+  margin-right: 8px; /* Space between icon and text */
+}
