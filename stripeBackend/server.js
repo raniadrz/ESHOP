@@ -1,42 +1,47 @@
 const express = require('express');
-const stripe = require('stripe')('sk_test_51P6Feq066R1dyNUymbqQ68IwPt2DhbwJUmTQhZlfkvWwzpF32rdXFR3XwnkHiGESWA4HN8tgxdZJ57V3jjxxaOcJ00vnPnLAzN'); // Replace with your Stripe secret key
+const Stripe = require('stripe');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const stripe = Stripe('pk_test_51P6Feq066R1dyNUyGmP7XnDJ6lntAX6FsDOmy39mkxGPXPRMm4RlN3l83dYyRW5YbB5wtE5sKFBC2mY9WyvOs1Na00ttd93Jt2');
 
 app.use(bodyParser.json());
 app.use(cors());
 
 app.post('/create-payment-intent', async (req, res) => {
-    const { paymentMethodId, amount, currency, customerEmail } = req.body;
+    const { amount, currency, customerEmail, paymentMethodId } = req.body;
 
     try {
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount,
-            currency,
-            payment_method: paymentMethodId,
-            receipt_email: customerEmail,
-            description: 'Purchase description',
-            confirm: true,
-            payment_method_types: ['card'], // Specify card explicitly
-        });
+        let paymentIntent;
+
+        if (paymentMethodId) {
+            paymentIntent = await stripe.paymentIntents.create({
+                amount,
+                currency,
+                payment_method: paymentMethodId,
+                receipt_email: customerEmail,
+                confirm: true
+            });
+        } else {
+            paymentIntent = await stripe.paymentIntents.create({
+                amount,
+                currency,
+                receipt_email: customerEmail,
+            });
+        }
 
         res.send({
             success: true,
-            paymentIntent,
+            paymentIntent
         });
     } catch (error) {
-        res.status(400).send({
+        console.log(error);
+        res.send({
             success: false,
-            error: error.message,
+            error: error.message
         });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
-// to start the backend : 
-// node server.js
+app.listen(3000, () => console.log('Server is running on port 3000'));

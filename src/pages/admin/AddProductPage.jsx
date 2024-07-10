@@ -1,7 +1,6 @@
 import { Timestamp, addDoc, collection } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useContext, useState, useEffect } from "react";
-import Papa from 'papaparse';
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import Loader from "../../components/loader/Loader";
@@ -110,42 +109,6 @@ const AddProductPage = () => {
             setLoading(false);
         }
     };
-
-    const handleCSVFileChange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        setLoading(true);
-        Papa.parse(file, {
-            header: true,
-            complete: async (results) => {
-                const products = results.data;
-                for (let product of products) {
-                    if (!isValidProduct(product)) {
-                        console.log(`Invalid product data: ${JSON.stringify(product)}`);
-                        continue;
-                    }
-                    try {
-                        let imageUrl = product.imageUrl || categoryImages[product.category] || defaultImageUrl;
-                        if (product.imageUrl) {
-                            const imageFile = await fetchImageFile(product.imageUrl);
-                            imageUrl = await uploadImageToFirebase(imageFile);
-                        }
-                        const productData = { ...product, productImageUrl: imageUrl, time: Timestamp.now() };
-                        const productRef = collection(fireDB, 'products');
-                        await addDoc(productRef, productData);
-                    } catch (error) {
-                        console.log(error);
-                        toast.error(`Failed to add product: ${product.title}`);
-                    }
-                }
-                toast.success("Products added successfully");
-                setLoading(false);
-                navigate('/admin-dashboard');
-            }
-        });
-    };
-
     const fetchImageFile = async (url) => {
         const response = await fetch(url);
         const data = await response.blob();
@@ -272,15 +235,6 @@ const AddProductPage = () => {
                         >
                             Add Product
                         </button>
-                    </div>
-                    <div className="mb-3">
-                        <input
-                            type="file"
-                            name="csvFile"
-                            onChange={handleCSVFileChange}
-                            accept=".csv"
-                            className='bg-blue-50 border text-blue-300 border-blue-200 px-2 py-2 w-96 rounded-md outline-none placeholder-blue-300'
-                        />
                     </div>
                 </div>
             )}

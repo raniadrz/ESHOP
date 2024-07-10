@@ -26,19 +26,24 @@ const BuyNowModal = ({ addressInfo, setAddressInfo }) => {
         return cart.reduce((total, item) => total + item.price * item.quantity, 0) * 100; // Amount in cents
     };
 
-    const buyNowFunction = async (paymentMethodId) => {
+    const buyNowFunction = async (paymentMethodId = null) => {
         try {
+            const body = {
+                amount: calculateTotalAmount(),
+                currency: 'usd',
+                customerEmail: addressInfo.email,
+            };
+            
+            if (paymentMethodId) {
+                body.paymentMethodId = paymentMethodId;
+            }
+
             const response = await fetch('http://localhost:3000/create-payment-intent', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    paymentMethodId,
-                    amount: calculateTotalAmount(),
-                    currency: 'usd',
-                    customerEmail: addressInfo.email,
-                }),
+                body: JSON.stringify(body),
             });
 
             const result = await response.json();
@@ -154,7 +159,7 @@ const BuyNowModal = ({ addressInfo, setAddressInfo }) => {
                                 type="button"
                                 onClick={() => {
                                     handleOpen();
-                                    buyNowFunction();
+                                    buyNowFunction(); // Call the function without a payment method
                                 }}
                                 className="w-full px-4 py-3 text-center text-gray-100 bg-blue-600 border border-transparent dark:border-gray-700 rounded-lg"
                             >
