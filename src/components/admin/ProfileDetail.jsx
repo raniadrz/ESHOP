@@ -141,7 +141,7 @@ const ProfileDetail = () => {
         <StyledPaper elevation={3}>
           <Box mb={5} textAlign="center">
             <Typography variant="h4" component="h1" color="primary" gutterBottom>
-              Admin Dashboard
+              Profile Setup
             </Typography>
           </Box>
 

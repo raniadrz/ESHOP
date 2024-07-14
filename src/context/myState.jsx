@@ -1,5 +1,4 @@
-/* eslint-disable react/prop-types */
-import { collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, updateDoc ,setDoc} from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, updateDoc, setDoc } from 'firebase/firestore';
 import { getAuth, updateEmail, updateProfile } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -16,54 +15,54 @@ function MyState({ children }) {
         setLoading(true);
         const auth = getAuth();
         const user = auth.currentUser;
-      
+
         try {
-          if (user) {
-            // Update email and profile in Firebase Auth
-            if (newEmail !== user.email) {
-              await updateEmail(user, newEmail);
-            }
-            if (newName !== user.displayName || photoURL !== user.photoURL) {
-              await updateProfile(user, { displayName: newName, photoURL: photoURL });
-            }
-      
-            // Check if the document exists in Firestore
-            const userDocRef = doc(fireDB, "users", uid); // Ensure the collection name is correct
-            const docSnapshot = await getDoc(userDocRef);
-      
-            if (docSnapshot.exists()) {
-              // Update Firestore document
-              await updateDoc(userDocRef, {
-                name: newName,
-                email: newEmail,
-                photoURL: photoURL
-              });
-      
-              toast.success('User details updated successfully');
-              getAllUserFunction();
+            if (user) {
+                // Update email and profile in Firebase Auth
+                if (newEmail !== user.email) {
+                    await updateEmail(user, newEmail);
+                }
+                if (newName !== user.displayName || photoURL !== user.photoURL) {
+                    await updateProfile(user, { displayName: newName, photoURL: photoURL });
+                }
+
+                // Check if the document exists in Firestore
+                const userDocRef = doc(fireDB, "users", uid); // Ensure the collection name is correct
+                const docSnapshot = await getDoc(userDocRef);
+
+                if (docSnapshot.exists()) {
+                    // Update Firestore document
+                    await updateDoc(userDocRef, {
+                        name: newName,
+                        email: newEmail,
+                        photoURL: photoURL
+                    });
+
+                    toast.success('User details updated successfully');
+                    getAllUserFunction();
+                } else {
+                    // If document does not exist, create a new one
+                    await setDoc(userDocRef, {
+                        name: newName,
+                        email: newEmail,
+                        photoURL: photoURL,
+                        role: user.role || 'User', // Handle undefined role
+                        time: user.metadata.creationTime
+                    });
+
+                    toast.success('User profile created successfully');
+                    getAllUserFunction();
+                }
             } else {
-              // If document does not exist, create a new one
-              await setDoc(userDocRef, {
-                name: newName,
-                email: newEmail,
-                photoURL: photoURL,
-                role: user.role || 'User', // Handle undefined role
-                time: user.metadata.creationTime
-              });
-      
-              toast.success('User profile created successfully');
-              getAllUserFunction();
+                throw new Error("No user is currently logged in");
             }
-          } else {
-            throw new Error("No user is currently logged in");
-          }
         } catch (error) {
-          console.error("Error updating user details: ", error);
-          toast.error("Failed to update user details");
+            console.error("Error updating user details: ", error);
+            toast.error("Failed to update user details");
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
+    };
 
     const getAllProductFunction = async () => {
         setLoading(true);
@@ -140,12 +139,12 @@ function MyState({ children }) {
         const newRole = currentRole === 'admin' ? 'user' : 'admin';
         try {
             const userDocRef = doc(fireDB, "user", uid);
-            console.log(`Updating user ${uid} role to ${newRole}`); 
+            console.log(`Updating user ${uid} role to ${newRole}`);
             await updateDoc(userDocRef, {
                 role: newRole
             });
             toast.success(`Role updated to ${newRole}`);
-            getAllUserFunction(); 
+            getAllUserFunction();
         } catch (error) {
             console.error("Error updating role: ", error);
             toast.error("Failed to update role");
@@ -153,8 +152,23 @@ function MyState({ children }) {
             setLoading(false);
         }
     }
-      
-    
+
+    const updateOrderStatus = async (orderId, status) => {
+        setLoading(true);
+        try {
+            const orderDocRef = doc(fireDB, "order", orderId);
+            await updateDoc(orderDocRef, {
+                status: status
+            });
+            toast.success('Order status updated successfully');
+            getAllOrderFunction();
+        } catch (error) {
+            console.error("Error updating order status: ", error);
+            toast.error("Failed to update order status");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
         getAllProductFunction();
@@ -172,7 +186,8 @@ function MyState({ children }) {
             orderDelete,
             getAllUser,
             updateUserRole,
-            updateUserDetails 
+            updateUserDetails,
+            updateOrderStatus
         }}>
             {children}
         </MyContext.Provider>

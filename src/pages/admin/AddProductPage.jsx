@@ -192,7 +192,7 @@ const AddProductPage = () => {
                             value={product.category}
                             onChange={(e) => setProduct({ ...product, category: e.target.value })}
                             className="w-1/2 px-1 py-2 text-blue-300 bg-blue-50 border border-blue-200 rounded-md outline-none  ">
-                            <option disabled>Select Product Category</option>
+                            <option disabled>Select Breed</option>
                             {categoryList.map((value, index) => (
                                 <option className=" first-letter:uppercase" key={index} value={value.name}>{value.name}</option>
                             ))}
@@ -201,7 +201,7 @@ const AddProductPage = () => {
                             value={product.category2}
                             onChange={(e) => setProduct({ ...product, category2: e.target.value })}
                             className="w-1/2 px-1 py-2 text-blue-300 bg-blue-50 border border-blue-200 rounded-md outline-none  ">
-                            <option disabled>Select Product Sub Category</option>
+                            <option disabled>Select Product Category</option>
                             {SubCategoryList.map((value, index) => (
                                 <option className=" first-letter:uppercase" key={index} value={value.name}>{value.name}</option>
                             ))}

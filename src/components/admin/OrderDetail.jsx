@@ -1,130 +1,112 @@
-import DeleteIcon from '@mui/icons-material/Delete';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, IconButton } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
 import { useContext, useState } from "react";
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { Box, IconButton, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Grid } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import myContext from "../../context/myContext";
 
 const OrderDetail = () => {
     const context = useContext(myContext);
-    const { getAllOrder, orderDelete } = context;
+    const { getAllOrder, orderDelete, updateOrderStatus } = context;
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [open, setOpen] = useState(false);
 
-    const [expandedOrders, setExpandedOrders] = useState({});
-
-    const toggleExpandOrder = (orderId) => {
-        setExpandedOrders((prev) => ({
-            ...prev,
-            [orderId]: !prev[orderId],
-        }));
+    const handleStatusChange = (orderId, status) => {
+        updateOrderStatus(orderId, status);
     };
 
-    const rows = getAllOrder.flatMap((order) => {
-        const orderRow = {
-            id: order.id,
-            isOrder: true,
-            orderId: order.id,
-            date: order.date,
-            status: order.status,
-            name: order.addressInfo.name,
-            totalItems: order.cartItems.length,
-        };
+    const handleClickOpen = (order) => {
+        setSelectedOrder(order);
+        setOpen(true);
+    };
 
-        const productRows = expandedOrders[order.id]
-            ? order.cartItems.map((item, itemIndex) => ({
-                  id: `${order.id}-${itemIndex}`,
-                  orderId: order.id,
-                  image: item.productImageUrl,
-                  title: item.title,
-                  code: item.code,
-                  category: item.category,
-                  category2: item.category2,
-                  subcategory: item.subcategory,
-                  price: item.price,
-                  quantity: item.quantity,
-                  totalPrice: item.price * item.quantity,
-                  isOrder: false,
-              }))
-            : [];
+    const handleClose = () => {
+        setSelectedOrder(null);
+        setOpen(false);
+    };
 
-        return [orderRow, ...productRows];
-    });
+    const handlePrint = () => {
+        window.print();
+    };
+
+    const formatDate = (date) => {
+        if (!date) return "N/A";
+        if (date.toDate) return date.toDate().toLocaleString('en-GB');
+        return new Date(date).toLocaleString('en-GB');
+    };
+
+    const rows = getAllOrder.map((order, orderIndex) => ({
+        id: orderIndex,
+        orderId: order.id,
+        status: order.status,
+        name: order.addressInfo?.name || "N/A",
+        address: order.addressInfo?.address || "N/A",
+        pincode: order.addressInfo?.pincode || "N/A",
+        mobileNumber: order.addressInfo?.mobileNumber || "N/A",
+        email: order.email || "N/A",
+        date: formatDate(order.date),
+        totalItems: order.cartItems.length,
+        totalPrice: order.cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        order,
+    }));
 
     const columns = [
         {
-            field: 'expand',
-            headerName: '',
-            width: 50,
-            sortable: false,
-            renderCell: (params) => {
-                if (params.row.isOrder) {
-                    return (
-                        <IconButton
-                            onClick={() => toggleExpandOrder(params.row.orderId)}
-                            size="small"
-                        >
-                            {expandedOrders[params.row.orderId] ? (
-                                <ExpandLessIcon />
-                            ) : (
-                                <ExpandMoreIcon />
-                            )}
-                        </IconButton>
-                    );
-                }
-                return null;
-            },
+            field: 'orderId', headerName: 'Order Id', width: 150,
+            renderCell: (params) => (
+                <Button variant="text" onClick={() => handleClickOpen(params.row.order)}>
+                    {params.value}
+                </Button>
+            )
         },
-        { field: 'orderId', headerName: 'Order ID', flex: 4, headerAlign: 'center', align: 'center',
-            renderCell: (params) => {
-                if (params.row.isOrder) {
-                    return params.value;
-                }
-                return null;
-            }
+        { field: 'status', headerName: 'Status', width: 150,
+            renderCell: (params) => (
+                <Select
+                    value={params.value}
+                    onChange={(e) => handleStatusChange(params.row.order.id, e.target.value)}
+                    fullWidth
+                >
+                    <MenuItem value="confirmed">Confirmed</MenuItem>
+                    <MenuItem value="packaging">Packaging</MenuItem>
+                    <MenuItem value="shipping">Shipping</MenuItem>
+                    <MenuItem value="delivered">Delivered</MenuItem>
+                    <MenuItem value="canceled">Canceled</MenuItem>
+                </Select>
+            )
         },
-        { field: 'date', headerName: 'Date', flex: 2, headerAlign: 'center', align: 'center' },
-        { field: 'status', headerName: 'Status', flex: 2, headerAlign: 'center', align: 'center' },
-        { field: 'name', headerName: 'Name', flex: 2, headerAlign: 'center', align: 'center' },
-        { field: 'totalItems', headerName: 'Total Items', flex: 2, headerAlign: 'center', align: 'center' },
-        { field: 'title', headerName: 'Product Name', flex: 2, headerAlign: 'center', align: 'center' },
-        { field: 'code', headerName: 'Code', flex: 3, headerAlign: 'center', align: 'center' },
-        { field: 'price', headerName: '€', flex: 1, headerAlign: 'center', align: 'center' },
-        { field: 'quantity', headerName: 'Quantity', flex: 2, headerAlign: 'center', align: 'center' },
-        { field: 'totalPrice', headerName: 'Total €', flex: 2, headerAlign: 'center', align: 'center' },
+        { field: 'name', headerName: 'Name', width: 150 },
+        { field: 'address', headerName: 'Address', width: 150 },
+        { field: 'pincode', headerName: 'Pincode', width: 100 },
+        { field: 'mobileNumber', headerName: 'Phone Number', width: 150 },
+        { field: 'email', headerName: 'Email', width: 200 },
+        { field: 'date', headerName: 'Date', width: 150 },
+        { field: 'totalItems', headerName: 'Total Items', width: 150 },
+        { field: 'totalPrice', headerName: 'Total Price', width: 150 },
         {
-            field: 'actions',
-            headerName: 'Action',
-            flex: 2,
-            headerAlign: 'center',
-            align: 'center',
-            renderCell: (params) => {
-                if (params.row.isOrder) {
-                    return (
-                        <IconButton onClick={() => orderDelete(params.row.orderId)}>
-                            <DeleteIcon style={{ color: 'red' }} />
-                        </IconButton>
-                    );
-                }
-                return null;
-            },
+            field: 'actions', headerName: 'Action', width: 100,
+            renderCell: (params) => (
+                <IconButton onClick={() => orderDelete(params.row.order.id)}>
+                    <DeleteIcon style={{ color: 'red' }} />
+                </IconButton>
+            )
         },
     ];
 
     return (
-        <div style={{height: '80vh'}}>
+        <div style={{ height: 600, width: '100%' }}>
             <div className="py-5">
-                <h1 className="text-xl text-red-300 font-bold">All Orders</h1>
+                <h1 className="text-xl text-pink-300 font-bold">All Orders</h1>
             </div>
-            <Box sx={{ height: 400, width: '100%' }}>
+            <Box sx={{ height: 600, width: '100%' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
                     pageSize={10}
                     rowsPerPageOptions={[10]}
                     disableSelectionOnClick
+                    components={{ Toolbar: GridToolbar }}
                     sx={{
                         '& .MuiDataGrid-root': {
-                            backgroundColor: '#10acbe;',
+                            backgroundColor: '#f5f5f5',
                         },
                         '& .MuiDataGrid-cell': {
                             textAlign: 'center',
@@ -140,6 +122,86 @@ const OrderDetail = () => {
                     }}
                 />
             </Box>
+            <Dialog 
+                open={open} 
+                onClose={handleClose} 
+                fullWidth 
+                maxWidth="md"
+                PaperProps={{
+                    sx: {
+                        padding: 2,
+                        backgroundColor: '#f9f9f9',
+                    }
+                }}
+            >
+                <DialogTitle sx={{ backgroundColor: '#f1f1f1' }}>Order Details</DialogTitle>
+                <DialogContent id="printable-content">
+                    {selectedOrder && (
+                        <Box sx={{ padding: 2 }}>
+                            <Typography variant="h6" sx={{ marginBottom: 2 }}>
+                                Order ID/CODE: {selectedOrder.id}
+                            </Typography>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body1" gutterBottom>
+                                        <strong>Date:</strong> {(selectedOrder.date)}
+                                    </Typography>
+                                    <Typography variant="body1" gutterBottom>
+                                        <strong>Name:</strong> {selectedOrder.addressInfo?.name}
+                                    </Typography>
+                                    <Typography variant="body1" gutterBottom>
+                                        <strong>Address:</strong> {selectedOrder.addressInfo?.address}
+                                    </Typography>
+                                    <Typography variant="body1" gutterBottom>
+                                        <strong>Pincode:</strong> {selectedOrder.addressInfo?.pincode}
+                                    </Typography>
+                                    <Typography variant="body1" gutterBottom>
+                                        <strong>Mobile Number:</strong> {selectedOrder.addressInfo?.mobileNumber}
+                                    </Typography>
+                                    <Typography variant="body1" gutterBottom>
+                                        <strong>Email:</strong> {selectedOrder.email}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body1" gutterBottom>
+                                        <strong>Cart Items:</strong>
+                                    </Typography>
+                                    <Grid container spacing={2}>
+                                        {selectedOrder.cartItems.map((item, index) => (
+                                            <Grid item xs={12} key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <img src={item.productImageUrl} alt="product" style={{ width: '50px', height: '50px', marginRight: '10px' }} />
+                                                <Box>
+                                                    <Typography variant="body2" component="div"><strong>Title:</strong> {item.title}</Typography>
+                                                    <Typography variant="body2" component="div"><strong>Category:</strong> {item.category}</Typography>
+                                                    <Typography variant="body2" component="div"><strong>Price:</strong> {item.price}€</Typography>
+                                                    <Typography variant="body2" component="div"><strong>Quantity:</strong> {item.quantity}</Typography>
+                                                    <Typography variant="body2" component="div"><strong>Total:</strong> {item.price * item.quantity}€</Typography>
+                                                </Box>
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                            <Box sx={{ marginTop: 2, paddingTop: 2, borderTop: '1px solid #ccc', textAlign: 'right' }}>
+                                <Typography variant="h6">
+                                    Total Price: {selectedOrder.cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)}€
+                                </Typography>
+                            </Box>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions className="no-print" sx={{ backgroundColor: '#f1f1f1' }}>
+                    <Button onClick={handleClose} color="primary">Close</Button>
+                    <Button onClick={handlePrint} color="primary">Print</Button>
+                </DialogActions>
+            </Dialog>
+            <style jsx global>{`
+                @media print {
+                    .no-print {
+                        display: none;
+                    }
+                }
+            `}</style>
         </div>
     );
 }
