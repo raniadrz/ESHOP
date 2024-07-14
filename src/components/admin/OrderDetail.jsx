@@ -92,11 +92,11 @@ const OrderDetail = () => {
     ];
 
     return (
-        <div style={{ height: 600, width: '100%' }}>
-            <div className="py-5">
-                <h1 className="text-xl text-pink-300 font-bold">All Orders</h1>
+        <div style={{ height: '50%', width: '100%' }}>
+            <div className="py-5 flex justify-between items-center">
+                <h1 className="text-xl text-blue-300 font-bold">All Orders</h1>
             </div>
-            <Box sx={{ height: 600, width: '100%' }}>
+            <Box sx={{ height:'50%', width: '100%' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
@@ -106,7 +106,7 @@ const OrderDetail = () => {
                     components={{ Toolbar: GridToolbar }}
                     sx={{
                         '& .MuiDataGrid-root': {
-                            backgroundColor: '#f5f5f5',
+                            backgroundColor: '#10acbe;',
                         },
                         '& .MuiDataGrid-cell': {
                             textAlign: 'center',
