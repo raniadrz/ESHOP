@@ -84,7 +84,7 @@ const Navbar = () => {
                                     <ListItemIcon>
                                         <DashboardIcon />
                                     </ListItemIcon>
-                            </ListItem>
+                                </ListItem>
                             </>
                         )}
                         {user.role === "admin" && (
@@ -98,6 +98,12 @@ const Navbar = () => {
 
                             <ListItem button component={Link} to="/user-settings">
                                 <ListItemText primary="Admin Settings" />
+                                <ListItemIcon>
+                                    <DashboardIcon />
+                                </ListItemIcon>
+                            </ListItem>
+                            <ListItem button component={Link} to="/coupon">
+                                <ListItemText primary="Coupons" />
                                 <ListItemIcon>
                                     <DashboardIcon />
                                 </ListItemIcon>
