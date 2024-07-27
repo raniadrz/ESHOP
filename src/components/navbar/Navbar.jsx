@@ -84,7 +84,7 @@ const Navbar = () => {
                                     <ListItemIcon>
                                         <DashboardIcon />
                                     </ListItemIcon>
-                            </ListItem>
+                                </ListItem>
                             </>
                         )}
                         {user.role === "admin" && (

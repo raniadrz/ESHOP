@@ -1,6 +1,7 @@
-import { collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, updateDoc, setDoc } from 'firebase/firestore';
+// context/myState.jsx
+import React, { createContext, useEffect, useState } from "react";
+import { collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, query, updateDoc, setDoc, addDoc } from 'firebase/firestore';
 import { getAuth, updateEmail, updateProfile } from 'firebase/auth';
-import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { fireDB } from '../firebase/FirebaseConfig';
 import MyContext from './myContext';
@@ -10,6 +11,13 @@ function MyState({ children }) {
     const [getAllProduct, setGetAllProduct] = useState([]);
     const [getAllOrder, setGetAllOrder] = useState([]);
     const [getAllUser, setGetAllUser] = useState([]);
+    const [coupons, setCoupons] = useState([]);
+
+    const fetchCoupons = async () => {
+        const querySnapshot = await getDocs(collection(fireDB, "coupons"));
+        const couponsArray = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setCoupons(couponsArray);
+    };
 
     const updateUserDetails = async (uid, newName, newEmail, photoURL) => {
         setLoading(true);
@@ -18,7 +26,6 @@ function MyState({ children }) {
 
         try {
             if (user) {
-                // Update email and profile in Firebase Auth
                 if (newEmail !== user.email) {
                     await updateEmail(user, newEmail);
                 }
@@ -26,12 +33,10 @@ function MyState({ children }) {
                     await updateProfile(user, { displayName: newName, photoURL: photoURL });
                 }
 
-                // Check if the document exists in Firestore
-                const userDocRef = doc(fireDB, "users", uid); // Ensure the collection name is correct
+                const userDocRef = doc(fireDB, "users", uid);
                 const docSnapshot = await getDoc(userDocRef);
 
                 if (docSnapshot.exists()) {
-                    // Update Firestore document
                     await updateDoc(userDocRef, {
                         name: newName,
                         email: newEmail,
@@ -41,12 +46,11 @@ function MyState({ children }) {
                     toast.success('User details updated successfully');
                     getAllUserFunction();
                 } else {
-                    // If document does not exist, create a new one
                     await setDoc(userDocRef, {
                         name: newName,
                         email: newEmail,
                         photoURL: photoURL,
-                        role: user.role || 'User', // Handle undefined role
+                        role: user.role || 'User',
                         time: user.metadata.creationTime
                     });
 
@@ -81,7 +85,7 @@ function MyState({ children }) {
             console.log(error);
             setLoading(false);
         }
-    }
+    };
 
     const getAllOrderFunction = async () => {
         setLoading(true);
@@ -100,7 +104,7 @@ function MyState({ children }) {
             console.log(error);
             setLoading(false);
         }
-    }
+    };
 
     const orderDelete = async (id) => {
         setLoading(true);
@@ -113,7 +117,7 @@ function MyState({ children }) {
             console.log(error);
             setLoading(false);
         }
-    }
+    };
 
     const getAllUserFunction = async () => {
         setLoading(true);
@@ -132,14 +136,13 @@ function MyState({ children }) {
             console.log(error);
             setLoading(false);
         }
-    }
+    };
 
     const updateUserRole = async (uid, currentRole) => {
         setLoading(true);
         const newRole = currentRole === 'admin' ? 'user' : 'admin';
         try {
             const userDocRef = doc(fireDB, "user", uid);
-            console.log(`Updating user ${uid} role to ${newRole}`);
             await updateDoc(userDocRef, {
                 role: newRole
             });
@@ -151,7 +154,7 @@ function MyState({ children }) {
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     const updateOrderStatus = async (orderId, status) => {
         setLoading(true);
@@ -168,12 +171,46 @@ function MyState({ children }) {
         } finally {
             setLoading(false);
         }
-    }
+    };
+
+    const addCoupon = async (coupon) => {
+        try {
+            await addDoc(collection(fireDB, "coupons"), coupon);
+            toast.success("Coupon added successfully!");
+            fetchCoupons();
+        } catch (error) {
+            toast.error("Failed to add coupon!");
+            console.error("Error adding coupon: ", error);
+        }
+    };
+
+    const deleteCoupon = async (id) => {
+        try {
+            await deleteDoc(doc(fireDB, "coupons", id));
+            toast.success("Coupon deleted successfully!");
+            fetchCoupons();
+        } catch (error) {
+            toast.error("Failed to delete coupon!");
+            console.error("Error deleting coupon: ", error);
+        }
+    };
+
+    const updateCoupon = async (id, updatedCoupon) => {
+        try {
+            await updateDoc(doc(fireDB, "coupons", id), updatedCoupon);
+            toast.success("Coupon updated successfully!");
+            fetchCoupons();
+        } catch (error) {
+            toast.error("Failed to update coupon!");
+            console.error("Error updating coupon: ", error);
+        }
+    };
 
     useEffect(() => {
         getAllProductFunction();
         getAllOrderFunction();
         getAllUserFunction();
+        fetchCoupons();
     }, []);
 
     return (
@@ -187,11 +224,16 @@ function MyState({ children }) {
             getAllUser,
             updateUserRole,
             updateUserDetails,
-            updateOrderStatus
+            updateOrderStatus,
+            coupons, 
+            addCoupon, 
+            deleteCoupon,
+            updateCoupon,
+            fetchCoupons,
         }}>
             {children}
         </MyContext.Provider>
-    )
+    );
 }
 
 export default MyState;

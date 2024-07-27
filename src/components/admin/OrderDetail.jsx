@@ -2,11 +2,13 @@ import { useContext, useState } from "react";
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Box, IconButton, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Grid } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PrintIcon from '@mui/icons-material/Print';
+import CloseIcon from '@mui/icons-material/Close';
 import myContext from "../../context/myContext";
 
 const OrderDetail = () => {
     const context = useContext(myContext);
-    const { getAllOrder, orderDelete, updateOrderStatus } = context;
+    const { getAllOrder, orderDelete, updateOrderStatus, updatePaymentMethod } = context;
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [open, setOpen] = useState(false);
 
@@ -28,6 +30,13 @@ const OrderDetail = () => {
         window.print();
     };
 
+    const handleDelete = () => {
+        if (selectedOrder) {
+            orderDelete(selectedOrder.id);
+            handleClose();
+        }
+    };
+
     const formatDate = (date) => {
         if (!date) return "N/A";
         if (date.toDate) return date.toDate().toLocaleString('en-GB');
@@ -46,6 +55,7 @@ const OrderDetail = () => {
         date: formatDate(order.date),
         totalItems: order.cartItems.length,
         totalPrice: order.cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        paymentMethod: order.paymentMethod || "N/A",
         order,
     }));
 
@@ -161,6 +171,9 @@ const OrderDetail = () => {
                                     <Typography variant="body1" gutterBottom>
                                         <strong>Email:</strong> {selectedOrder.email}
                                     </Typography>
+                                    <Typography variant="body1" gutterBottom>
+                                        <strong>Payment Method:</strong> {selectedOrder.addressInfo?.paymentMethod}
+                                    </Typography>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <Typography variant="body1" gutterBottom>
@@ -190,9 +203,16 @@ const OrderDetail = () => {
                         </Box>
                     )}
                 </DialogContent>
-                <DialogActions className="no-print" sx={{ backgroundColor: '#f1f1f1' }}>
-                    <Button onClick={handleClose} color="primary">Close</Button>
-                    <Button onClick={handlePrint} color="primary">Print</Button>
+                <DialogActions className="no-print" sx={{ backgroundColor: '#f1f1f1', display: 'flex', justifyContent: 'space-between' }}>
+                    <IconButton onClick={handleClose} color="primary" title="Close">
+                        <CloseIcon />
+                    </IconButton>
+                    <IconButton onClick={handlePrint} color="primary" title="Print">
+                        <PrintIcon />
+                    </IconButton>
+                    <IconButton onClick={handleDelete} color="secondary" title="Delete">
+                        <DeleteIcon style={{ color: 'red' }} />
+                    </IconButton>
                 </DialogActions>
             </Dialog>
             <style jsx global>{`

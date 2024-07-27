@@ -84,6 +84,24 @@ const BuyNowModal = ({ addressInfo, setAddressInfo, buyNowFunction }) => {
                         />
                     </div>
 
+                    <div className="mb-3">
+                        <select
+                            name="paymentMethod"
+                            value={addressInfo.paymentMethod}
+                            onChange={(e) =>{
+                                setAddressInfo({
+                                    ...addressInfo,
+                                    paymentMethod: e.target.value
+                                })
+                            }}
+                            className="bg-blue-50 border border-blue-200 px-2 py-2 w-full rounded-md outline-none text-blue-600"
+                        >
+                            <option value="po">Pay Options</option>
+                            <option value="cash">Cash</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                        </select>
+                    </div>
+
                     <div className="">
                         <Button
 
