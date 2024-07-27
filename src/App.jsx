@@ -26,7 +26,6 @@ import Contact from "./pages/footer/contact/Contact";
 import PPolicy from "./pages/footer/privacyPolicy/privacyPolicy";
 import ReturnPolicy from './pages/footer/returnPolicy/ReturnPolicy';
 import UserSettings from './components/admin/ProfileDetail';
-import Coupon from"./components/admin/CouponContext";
 
 function  App () {
   return (
@@ -59,11 +58,6 @@ function  App () {
           <Route path="/addproduct" element={
             <ProtectedRouteForAdmin>
               <AddProductPage />
-            </ProtectedRouteForAdmin>
-          } />
-          <Route path="/coupon" element={
-            <ProtectedRouteForAdmin>
-              <Coupon />
             </ProtectedRouteForAdmin>
           } />
           <Route path="/updateproduct/:id" element={

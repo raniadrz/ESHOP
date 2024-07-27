@@ -102,12 +102,6 @@ const Navbar = () => {
                                     <DashboardIcon />
                                 </ListItemIcon>
                             </ListItem>
-                            <ListItem button component={Link} to="/coupon">
-                                <ListItemText primary="Coupons" />
-                                <ListItemIcon>
-                                    <DashboardIcon />
-                                </ListItemIcon>
-                            </ListItem>
                             </>
                             
                         )}
