@@ -1,7 +1,6 @@
-// context/myState.jsx
 import React, { createContext, useEffect, useState } from "react";
 import { collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, query, updateDoc, setDoc, addDoc } from 'firebase/firestore';
-import { getAuth, updateEmail, updateProfile } from 'firebase/auth';
+import { getAuth, updateEmail, updateProfile, deleteUser as fbDeleteUser } from 'firebase/auth';
 import toast from 'react-hot-toast';
 import { fireDB } from '../firebase/FirebaseConfig';
 import MyContext from './myContext';
@@ -206,6 +205,30 @@ function MyState({ children }) {
         }
     };
 
+    const deleteUser = async (uid) => {
+        setLoading(true);
+        try {
+            // Delete from Firestore
+            const userDocRef = doc(fireDB, "user", uid);
+            await deleteDoc(userDocRef);
+            
+            // Optionally, delete from Authentication if needed
+            const auth = getAuth();
+            const user = auth.currentUser;
+            if (user && user.uid === uid) {
+                await fbDeleteUser(user);
+            }
+            
+            toast.success("User deleted successfully");
+            getAllUserFunction();
+        } catch (error) {
+            console.error("Error deleting user: ", error);
+            toast.error("Failed to delete user");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         getAllProductFunction();
         getAllOrderFunction();
@@ -230,6 +253,7 @@ function MyState({ children }) {
             deleteCoupon,
             updateCoupon,
             fetchCoupons,
+            deleteUser, // Add deleteUser to the context provider
         }}>
             {children}
         </MyContext.Provider>

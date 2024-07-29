@@ -1,4 +1,5 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useContext, useState } from 'react';
@@ -6,7 +7,7 @@ import MyContext from "../../context/myContext";
 
 const UserDetail = () => {
     const context = useContext(MyContext);
-    const { getAllUser, updateUserRole } = context;
+    const { getAllUser, updateUserRole, deleteUser } = context;
 
     const [open, setOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -26,6 +27,11 @@ const UserDetail = () => {
         handleClose();
     };
 
+    const handleDelete = async (user) => {
+        await deleteUser(user.uid);
+        // Optionally, refresh the data grid or state
+    };
+
     const columns = [
         { field: 'id', headerName: 'S.No.', flex: 1, headerAlign: 'center', align: 'center' },
         { field: 'name', headerName: 'Name', flex: 1, headerAlign: 'center', align: 'center' },
@@ -39,12 +45,20 @@ const UserDetail = () => {
             headerAlign: 'center',
             align: 'center',
             renderCell: (params) => (
-                <IconButton
-                    onClick={() => handleClickOpen(params.row)}
-                    color="primary"
-                >
-                    <AccountCircleIcon />
-                </IconButton>
+                <div>
+                    <IconButton
+                        onClick={() => handleClickOpen(params.row)}
+                        color="primary"
+                    >
+                        <AccountCircleIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => handleDelete(params.row)}
+                        color="secondary"
+                    >
+                        <DeleteIcon style={{ color: 'red' }} />
+                    </IconButton>
+                </div>
             ),
         },
     ];
