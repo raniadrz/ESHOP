@@ -66,25 +66,13 @@ const Navbar = () => {
                         {user.role === "user" && (
                             <>
                                 <ListItem button component={Link} to="/user-dashboard">
-                                    <ListItemText primary="User Dashboard" />
+                                    <ListItemText primary="User Settings" />
                                     <ListItemIcon>
                                         <DashboardIcon />
                                     </ListItemIcon>
                                 </ListItem>
 
-                                <ListItem button component={Link} to="/allproduct">
-                                    <ListItemText primary="All Products" />
-                                    <ListItemIcon>
-                                        <CategoryIcon />
-                                    </ListItemIcon>
-                                </ListItem>
                                 
-                                <ListItem button component={Link} to="/user-settings">
-                                    <ListItemText primary="Customer Settings" />
-                                    <ListItemIcon>
-                                        <DashboardIcon />
-                                    </ListItemIcon>
-                                </ListItem>
                             </>
                         )}
                         {user.role === "admin" && (
@@ -96,7 +84,7 @@ const Navbar = () => {
                                 </ListItemIcon>
                             </ListItem>
 
-                            <ListItem button component={Link} to="/user-settings">
+                            <ListItem button component={Link} to="/admin-settings">
                                 <ListItemText primary="Admin Settings" />
                                 <ListItemIcon>
                                     <DashboardIcon />

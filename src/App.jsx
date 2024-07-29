@@ -9,7 +9,6 @@ import MyState from "./context/myState";
 import AddProductPage from "./pages/admin/AddProductPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UpdateProductPage from "./pages/admin/UpdateProductPage";
-import AllProduct from "./pages/allProduct/AllProduct";
 import CartPage from "./pages/cart/CartPage";
 import CategoryPage from "./pages/category/CategoryPage";
 import HomePage from "./pages/home/HomePage";
@@ -41,7 +40,6 @@ function  App () {
           <Route path="/about" element={<About />} />
           <Route path="/productinfo/:id" element={<ProductInfo />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/allproduct" element={<AllProduct />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/category/:categoryname" element={<CategoryPage />} />  {/* category Page route  */}
@@ -65,7 +63,7 @@ function  App () {
               <UpdateProductPage />
             </ProtectedRouteForAdmin>
           } />
-          <Route path="/user-settings" element={
+          <Route path="/admin-settings" element={
             <ProtectedRouteForAdmin>
               <UserSettings />
             </ProtectedRouteForAdmin>
