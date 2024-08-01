@@ -46,19 +46,19 @@ const ProductDetail = () => {
   const columns = [
     { field: 'code', headerName: 'Code', flex: 1.5, headerAlign: 'center', align: 'center' },
     { field: 'title', headerName: 'Title', flex: 3, headerAlign: 'center', align: 'center', headerClassName: 'bold-header' },
-    { field: 'category', headerName: 'Category', flex: 2, headerAlign: 'center', align: 'center' },
-    { field: 'category2', headerName: 'Category2', flex: 2.5, headerAlign: 'center', align: 'center' },
+    { field: 'category', headerName: 'Breed', flex: 2, headerAlign: 'center', align: 'center' },
+    { field: 'category2', headerName: 'Category', flex: 2.5, headerAlign: 'center', align: 'center' },
     { field: 'subcategory', headerName: 'SubCategory', flex: 1.5, headerAlign: 'center', align: 'center' },
     { field: 'date', headerName: 'Date', flex: 2, headerAlign: 'center', align: 'center' },
     { field: 'price', headerName: 'Price', flex: 1, headerAlign: 'center', align: 'center' },
     {
       field: 'image',
       headerName: 'Image',
-      flex: 2.5,
+      flex: 2,
       headerAlign: 'center',
       align: 'center',
       renderCell: (params) => (
-        <img src={params.value} alt="product" style={{ width: '100%', borderRadius: '4px' }} />
+        <img src={params.value} alt="product" style={{ width: '50%', borderRadius: '40px' }} />
       )
     },
     {
