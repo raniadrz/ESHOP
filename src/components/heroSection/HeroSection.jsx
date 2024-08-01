@@ -19,14 +19,38 @@ const HeroSection = () => {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 6000,
+    arrows: false,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          arrows: false,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          arrows: false,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          arrows: false,
+          dots: true,
+        },
+      },
+    ],
   };
 
   return (
     <div className="hero-slider">
       <Slider {...settings}>
         {images.map((image, index) => (
-          <div key={index}>
-            <img className="h-44 lg:h-full w-full object-cover" src={image} alt={`Slide ${index + 1}`} />
+          <div key={index} className="slider-item">
+            <img className="hero-image" src={image} alt={`Slide ${index + 1}`} />
           </div>
         ))}
       </Slider>
