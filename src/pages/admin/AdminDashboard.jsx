@@ -1,9 +1,9 @@
 import Papa from 'papaparse';
 import { useContext, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import OrderDetail from '../../components/admin/OrderDetail';
-import ProductDetail from '../../components/admin/ProductDetail';
-import UserDetail from '../../components/admin/UserDetail';
+import OrderDetail from '../../components/admin/Dashboard/OrderDetail';
+import ProductDetail from '../../components/admin/Dashboard/ProductDetail';
+import UserDetail from '../../components/admin/Dashboard/UserDetail';
 import Layout from "../../components/layout/Layout";
 import updatePassword from "../../components/user/UpdatePassword";
 import myContext from '../../context/myContext';

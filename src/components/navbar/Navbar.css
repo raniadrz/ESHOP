@@ -1,29 +1,85 @@
 /* Navbar.css */
 
-/* Drawer styles */
+/* Drawer styles for mobile */
 .drawer-list {
-  background-color: #2d68b1; /* Light grey background */
+  background-color: #17174f; /* Dark background */
   height: 100%;
-  width: 250px; /* Width of the side nav */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10%;
 }
 
 /* List item styles */
 .MuiListItem-root {
-  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-  text-align: center; /* Center text */
+  transition: background-color 0.9s ease, transform 0.9s ease;
+  text-align: center;
+  color: #ffffff; /* Light text color */
+}
+
+.MuiListItem-root:hover {
+  transform: scale(1.15); /* Slightly increase size on hover */
 }
 
 /* List item text styles */
 .MuiListItemText-root {
-  text-align: center; /* Center the text */
+  text-align: center;
+  color: inherit;
 }
 
-/* Nested list styles */
-.nested-list {
-  padding-left: 20px; /* Indentation for nested items */
+/* Navbar styles */
+.navbar-title {
+  font: weight 100px;
+  color: #fff;
+  text-decoration: none;
 }
 
-/* Specific styles for the user options icon */
-.user-options-icon {
-  margin-right: 8px; /* Space between icon and text */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 4;
+  }
+}
+
+/* Full-screen animation for mobile drawer opening */
+.MuiDrawer-paper {
+  animation: slideIn 0.9s ease-out, fadeIn 0.9s ease-out;
+  width: 100%; /* Full-screen width on mobile */
+}
+
+/* Navbar link styles for larger screens */
+.navbar-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  color: #fff;
+  font-size: 1.1rem; 
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.6s ease;
+}
+
+.navbar-links a:hover {
+  color: #7ed6f9; /* Change link color on hover */
+}
+
+@media (max-width: 600px) {
+  /* Mobile-specific styles */
+  .navbar-links {
+    display: none;
+  }
 }

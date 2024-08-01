@@ -1,8 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import myContext from '../../context/myContext';
 import Layout from "../../components/layout/Layout";
-import updatePassword from "../../components/user/UpdatePassword";
-import { getAuth } from 'firebase/auth';
+import { getAuth, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import toast from 'react-hot-toast';
 import {
@@ -36,25 +35,38 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
   margin: 'auto',
 }));
 
-const SubmitButton = styled(Button)(({ theme }) => ({
-  marginTop: theme.spacing(2),
+const AvatarCollage = styled(Grid)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  flexWrap: 'wrap',
+  gap: theme.spacing(2),
 }));
 
-const SaveButton = styled(Button)(({ theme }) => ({
-  marginTop: theme.spacing(2),
+const CollageAvatar = styled(Avatar)(({ theme }) => ({
+  width: theme.spacing(7),
+  height: theme.spacing(7),
+  cursor: 'pointer',
+  border: '2px solid transparent',
+  '&:hover': {
+    border: `2px solid ${theme.palette.primary.main}`,
+  },
+  '&.selected': {
+    border: `2px solid ${theme.palette.secondary.main}`,
+  },
+}));
+
+const SubmitButton = styled(Button)(({ theme }) => ({
   marginLeft: theme.spacing(2),
+  height: '56px', // Ensure the button matches the TextField's height
 }));
 
 const defaultAvatars = [
   'https://cdn-icons-png.flaticon.com/128/2202/2202112.png',
   'https://cdn-icons-png.flaticon.com/128/236/236831.png',
-  'https://cdn-icons-png.flaticon.com/128/1946/1946429.png',
   'https://cdn-icons-png.flaticon.com/128/2922/2922510.png',
   'https://cdn-icons-png.flaticon.com/128/2922/2922656.png',
   'https://cdn-icons-png.flaticon.com/128/2922/2922522.png',
   'https://cdn-icons-png.flaticon.com/128/2922/2922561.png',
-  'https://cdn-icons-png.flaticon.com/128/2922/2922636.png',
-  'https://cdn-icons-png.flaticon.com/128/2922/2922665.png',
   'https://cdn-icons-png.flaticon.com/128/2922/2922715.png'
 ];
 
@@ -64,6 +76,7 @@ const ProfileDetail = () => {
   const user = auth.currentUser;
 
   const [newPassword, setNewPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newName, setNewName] = useState(user?.displayName || '');
   const [newEmail, setNewEmail] = useState(user?.email || '');
   const [avatar, setAvatar] = useState(user?.photoURL || defaultAvatars[0]);
@@ -77,21 +90,52 @@ const ProfileDetail = () => {
     }
   }, [user]);
 
-  const handlePasswordChange = () => {
-    updatePassword(newPassword);
+  const reauthenticateUser = async () => {
+    if (!currentPassword) {
+      toast.error('Please enter your current password for re-authentication.');
+      return false;
+    }
+
+    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+
+    try {
+      await reauthenticateWithCredential(user, credential);
+      return true;
+    } catch (error) {
+      console.error('Re-authentication failed: ', error);
+      toast.error('Re-authentication failed. Please check your password.');
+      return false;
+    }
   };
 
-  const handleDetailsChange = async () => {
+  const handleUpdateProfile = async () => {
     if (user) {
       try {
+        // Re-authenticate the user if required
+        const isAuthenticated = await reauthenticateUser();
+        if (!isAuthenticated) return;
+
+        // Update password if changed
+        if (newPassword) {
+          await updatePassword(user, newPassword);
+          toast.success('Password updated successfully');
+        }
+
+        // Upload new avatar if a new image is selected
+        if (imageFile) {
+          const photoURL = await uploadAvatarToFirebase(imageFile);
+          setAvatar(photoURL);
+        }
+
+        // Update user details (name and avatar URL in Firestore)
         await context.updateUserDetails(user.uid, newName, newEmail, avatar);
-        toast.success('Details updated successfully');
+        toast.success('Profile updated successfully');
       } catch (error) {
-        console.error("Failed to update user details: ", error);
-        toast.error("Failed to update details");
+        console.error('Failed to update profile: ', error);
+        toast.error('Failed to update profile');
       }
     } else {
-      console.error("User ID is missing");
+      console.error('User ID is missing');
     }
   };
 
@@ -113,25 +157,10 @@ const ProfileDetail = () => {
     setAvatar(URL.createObjectURL(file)); // Show preview of the selected image
   };
 
-  const handleSaveAvatar = async () => {
-    if (user) {
-      try {
-        let photoURL = avatar;
-
-        if (imageFile) {
-          photoURL = await uploadAvatarToFirebase(imageFile);
-          setAvatar(photoURL); // Update avatar state after successful upload
-        }
-
-        await context.updateUserDetails(user.uid, user.displayName, user.email, photoURL);
-        toast.success('Avatar updated successfully');
-      } catch (error) {
-        console.error("Failed to update avatar: ", error);
-        toast.error("Failed to update avatar");
-      }
-    } else {
-      console.error("User ID is missing");
-    }
+  // Function to format the date string
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(); // Formats date to MM/DD/YYYY by default
   };
 
   return (
@@ -145,7 +174,7 @@ const ProfileDetail = () => {
             </Typography>
           </Box>
 
-          <Box textAlign="center" mb={5}>
+          <Box textAlign="center" mb={1}>
             <StyledAvatar src={avatar} alt="User Avatar" />
             <input
               accept="image/*"
@@ -161,15 +190,18 @@ const ProfileDetail = () => {
             </label>
           </Box>
 
-          <Grid container spacing={2} justifyContent="center">
+          <AvatarCollage container spacing={2}>
             {defaultAvatars.map((avatarUrl, index) => (
-              <Grid item key={index} onClick={() => handleAvatarChange(avatarUrl)}>
-                <Avatar src={avatarUrl} style={{ cursor: 'pointer' }} />
-              </Grid>
+              <CollageAvatar
+                key={index}
+                src={avatarUrl}
+                onClick={() => handleAvatarChange(avatarUrl)}
+                className={avatar === avatarUrl ? 'selected' : ''}
+              />
             ))}
-          </Grid>
+          </AvatarCollage>
 
-          <Grid container spacing={2} mt={2}>
+          <Grid container spacing={4} mt={2}>
             <Grid item xs={12}>
               <TextField
                 variant="outlined"
@@ -185,17 +217,20 @@ const ProfileDetail = () => {
                 label="Email"
                 fullWidth
                 value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
+                InputProps={{
+                  readOnly: true,
+                }}
+                helperText="Email cannot be changed"
               />
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="h6" align="center">
+              <Typography variant="h6" align="left">
                 <strong>Date: </strong>
-                {user?.metadata.creationTime}
+                {user?.metadata.creationTime ? formatDate(user.metadata.creationTime) : 'N/A'}
               </Typography>
             </Grid>
             <Grid item xs={12}>
-              <Typography variant="h6" align="center">
+              <Typography variant="h6" align="left">
                 <strong>Role: </strong>
                 {user?.role || 'User'}
               </Typography>
@@ -210,30 +245,28 @@ const ProfileDetail = () => {
                 onChange={(e) => setNewPassword(e.target.value)}
               />
             </Grid>
-            <Grid item xs={12} textAlign="center">
-              <SubmitButton
-                variant="contained"
-                color="primary"
-                onClick={handlePasswordChange}
-              >
-                Update Password
-              </SubmitButton>
-              <SaveButton
-                variant="contained"
-                color="secondary"
-                onClick={handleSaveAvatar}
-              >
-                Save Avatar
-              </SaveButton>
-            </Grid>
-            <Grid item xs={12} textAlign="center">
-              <SubmitButton
-                variant="contained"
-                color="secondary"
-                onClick={handleDetailsChange}
-              >
-                Update Details
-              </SubmitButton>
+            <Grid item xs={12}>
+              <Grid container alignItems="center">
+                <Grid item xs={8}>
+                  <TextField
+                    variant="outlined"
+                    label="Current Password"
+                    type="password"
+                    fullWidth
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <SubmitButton
+                    variant="contained"
+                    color="primary"
+                    onClick={handleUpdateProfile}
+                  >
+                    Update Profile
+                  </SubmitButton>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </StyledPaper>

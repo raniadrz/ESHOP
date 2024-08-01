@@ -1,14 +1,14 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Box, IconButton, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Grid } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PrintIcon from '@mui/icons-material/Print';
 import CloseIcon from '@mui/icons-material/Close';
-import myContext from "../../context/myContext";
+import myContext from "../../../context/myContext";
 
 const OrderDetail = () => {
     const context = useContext(myContext);
-    const { getAllOrder, orderDelete, updateOrderStatus, updatePaymentMethod } = context;
+    const { getAllOrder, orderDelete, updateOrderStatus } = context;
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [open, setOpen] = useState(false);
 
@@ -102,11 +102,11 @@ const OrderDetail = () => {
     ];
 
     return (
-        <div style={{ height: '50%', width: '100%' }}>
+        <div style={{ height: '70vh', width: '100%' }}>
             <div className="py-5 flex justify-between items-center">
-                <h1 className="text-xl text-blue-300 font-bold">All Orders</h1>
+                <h1 className="text-xl text-blue-600 font-bold">All Orders</h1>
             </div>
-            <Box sx={{ height:'50%', width: '100%' }}>
+            <Box sx={{ height: '100%', width: '100%' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
@@ -116,18 +116,27 @@ const OrderDetail = () => {
                     components={{ Toolbar: GridToolbar }}
                     sx={{
                         '& .MuiDataGrid-root': {
-                            backgroundColor: '#10acbe;',
+                            backgroundColor: '#005689', // Light blue background
                         },
                         '& .MuiDataGrid-cell': {
                             textAlign: 'center',
+                            '&:hover': {
+                                backgroundColor: '#d5eeff', // Light blue on hover
+                            },
                         },
                         '& .MuiDataGrid-columnHeaders': {
-                            backgroundColor: '#e0e0e0',
+                            backgroundColor: '#2196f3', // Blue header background
                             textAlign: 'center',
                         },
                         '& .MuiDataGrid-columnHeaderTitle': {
                             fontWeight: 'bold',
+                            color: '#ffffff', // White text in headers
                             textAlign: 'center',
+                        },
+                        '& .MuiDataGrid-row': {
+                            '&:nth-of-type(odd)': {
+                                backgroundColor: '#d5eeff', // Alternate row color
+                            },
                         },
                     }}
                 />

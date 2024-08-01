@@ -1,35 +1,46 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useContext, useState } from 'react';
-import MyContext from "../../context/myContext";
+import MyContext from "../../../context/myContext";
+import UserCreationForm from '../UserCreationForm'; // Import your existing form component
 
 const UserDetail = () => {
     const context = useContext(MyContext);
     const { getAllUser, updateUserRole, deleteUser } = context;
 
-    const [open, setOpen] = useState(false);
+    const [openRoleDialog, setOpenRoleDialog] = useState(false);
+    const [openCreateDialog, setOpenCreateDialog] = useState(false); // State for create user dialog
     const [selectedUser, setSelectedUser] = useState(null);
 
-    const handleClickOpen = (user) => {
+    const handleClickOpenRoleDialog = (user) => {
         setSelectedUser(user);
-        setOpen(true);
+        setOpenRoleDialog(true);
     };
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleCloseRoleDialog = () => {
+        setOpenRoleDialog(false);
         setSelectedUser(null);
     };
 
-    const handleConfirm = () => {
+    const handleConfirmRoleChange = () => {
         updateUserRole(selectedUser.uid, selectedUser.role);
-        handleClose();
+        handleCloseRoleDialog();
     };
 
     const handleDelete = async (user) => {
         await deleteUser(user.uid);
         // Optionally, refresh the data grid or state
+    };
+
+    const handleOpenCreateDialog = () => {
+        setOpenCreateDialog(true);
+    };
+
+    const handleCloseCreateDialog = () => {
+        setOpenCreateDialog(false);
     };
 
     const columns = [
@@ -47,7 +58,7 @@ const UserDetail = () => {
             renderCell: (params) => (
                 <div>
                     <IconButton
-                        onClick={() => handleClickOpen(params.row)}
+                        onClick={() => handleClickOpenRoleDialog(params.row)}
                         color="primary"
                     >
                         <AccountCircleIcon />
@@ -73,9 +84,24 @@ const UserDetail = () => {
     }));
 
     return (
-        <div style={{ height: '100%' }}>
-            <div className="flex justify-between items-center">
-                <h1 className="text-xl text-blue-300 font-bold">All User</h1>
+        <div style={{ height: '70vh', width: '100%' }}>
+            <div className="py-5 flex justify-between items-center">
+                <h1 className="text-xl text-blue-600 font-bold">All Users</h1>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<PersonAddIcon />}
+                    onClick={handleOpenCreateDialog}
+                    sx={{
+                        textTransform: 'none',
+                        backgroundColor: '#2196f3',
+                        '&:hover': {
+                            backgroundColor: '#1e88e5',
+                        }
+                    }}
+                >
+                    Add New Account
+                </Button>
             </div>
             <div style={{ flexGrow: 1 }}>
                 <DataGrid
@@ -87,40 +113,78 @@ const UserDetail = () => {
                     autoHeight
                     sx={{
                         '& .MuiDataGrid-root': {
-                            backgroundColor: '#10acbe;',
+                            backgroundColor: '#005689', // Light blue background
                         },
                         '& .MuiDataGrid-cell': {
                             textAlign: 'center',
+                            '&:hover': {
+                                backgroundColor: '#d5eeff', // Light blue on hover
+                            },
                         },
                         '& .MuiDataGrid-columnHeaders': {
-                            backgroundColor: '#e0e0e0',
+                            backgroundColor: '#2196f3', // Blue header background
                             textAlign: 'center',
                         },
                         '& .MuiDataGrid-columnHeaderTitle': {
                             fontWeight: 'bold',
+                            color: '#ffffff', // White text in headers
                             textAlign: 'center',
+                        },
+                        '& .MuiDataGrid-row': {
+                            '&:nth-of-type(odd)': {
+                                backgroundColor: '#d5eeff', // Alternate row color
+                            },
                         },
                     }}
                 />
             </div>
             <Dialog
-                open={open}
-                onClose={handleClose}
+                open={openRoleDialog}
+                onClose={handleCloseRoleDialog}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
+                PaperProps={{
+                    sx: {
+                        backgroundColor: '#f9f9f9',
+                    }
+                }}
             >
-                <DialogTitle id="alert-dialog-title">{"Change User Role"}</DialogTitle>
+                <DialogTitle id="alert-dialog-title" sx={{ backgroundColor: '#f1f1f1' }}>
+                    Change User Role
+                </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
                         Are you sure you want to change the role of {selectedUser ? selectedUser.name : ''}?
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} color="primary">
+                <DialogActions sx={{ backgroundColor: '#f1f1f1' }}>
+                    <Button onClick={handleCloseRoleDialog} color="primary">
                         No
                     </Button>
-                    <Button onClick={handleConfirm} color="primary" autoFocus>
+                    <Button onClick={handleConfirmRoleChange} color="primary" autoFocus>
                         Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* User Creation Dialog */}
+            <Dialog
+                open={openCreateDialog}
+                onClose={handleCloseCreateDialog}
+                fullWidth
+                maxWidth="sm"
+                PaperProps={{
+                    sx: {
+                        backgroundColor: '#ffffff',
+                    }
+                }}
+            >
+                <DialogTitle sx={{ backgroundColor: '#f1f1f1' }}>New Account</DialogTitle>
+                <DialogContent>
+                    <UserCreationForm /> {/* Render your user creation form component */}
+                </DialogContent>
+                <DialogActions sx={{ backgroundColor: '#f1f1f1' }}>
+                    <Button onClick={handleCloseCreateDialog} color="primary">
+                        Cancel
                     </Button>
                 </DialogActions>
             </Dialog>

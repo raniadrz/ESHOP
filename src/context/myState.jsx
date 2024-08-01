@@ -1,263 +1,279 @@
 import React, { createContext, useEffect, useState } from "react";
-import { collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, query, updateDoc, setDoc, addDoc } from 'firebase/firestore';
-import { getAuth, updateEmail, updateProfile, deleteUser as fbDeleteUser } from 'firebase/auth';
-import toast from 'react-hot-toast';
-import { fireDB } from '../firebase/FirebaseConfig';
-import MyContext from './myContext';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  updateDoc,
+  setDoc,
+  addDoc,
+  getDoc,
+} from "firebase/firestore";
+import {
+  getAuth,
+  updateEmail,
+  updateProfile,
+  deleteUser as fbDeleteUser,
+} from "firebase/auth";
+import toast from "react-hot-toast";
+import { fireDB } from "../firebase/FirebaseConfig";
+import MyContext from "./myContext";
 
 function MyState({ children }) {
-    const [loading, setLoading] = useState(false);
-    const [getAllProduct, setGetAllProduct] = useState([]);
-    const [getAllOrder, setGetAllOrder] = useState([]);
-    const [getAllUser, setGetAllUser] = useState([]);
-    const [coupons, setCoupons] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [getAllProduct, setGetAllProduct] = useState([]);
+  const [getAllOrder, setGetAllOrder] = useState([]);
+  const [getAllUser, setGetAllUser] = useState([]);
+  const [coupons, setCoupons] = useState([]);
 
-    const fetchCoupons = async () => {
-        const querySnapshot = await getDocs(collection(fireDB, "coupons"));
-        const couponsArray = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setCoupons(couponsArray);
-    };
+  // Fetch Coupons
+  const fetchCoupons = async () => {
+    const querySnapshot = await getDocs(collection(fireDB, "coupons"));
+    const couponsArray = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setCoupons(couponsArray);
+  };
 
-    const updateUserDetails = async (uid, newName, newEmail, photoURL) => {
-        setLoading(true);
-        const auth = getAuth();
-        const user = auth.currentUser;
+  // Create or Update User Details
+  const updateUserDetails = async (uid, newName, newEmail, photoURL) => {
+    setLoading(true);
+    const auth = getAuth();
+    const user = auth.currentUser;
 
-        try {
-            if (user) {
-                if (newEmail !== user.email) {
-                    await updateEmail(user, newEmail);
-                }
-                if (newName !== user.displayName || photoURL !== user.photoURL) {
-                    await updateProfile(user, { displayName: newName, photoURL: photoURL });
-                }
-
-                const userDocRef = doc(fireDB, "users", uid);
-                const docSnapshot = await getDoc(userDocRef);
-
-                if (docSnapshot.exists()) {
-                    await updateDoc(userDocRef, {
-                        name: newName,
-                        email: newEmail,
-                        photoURL: photoURL
-                    });
-
-                    toast.success('User details updated successfully');
-                    getAllUserFunction();
-                } else {
-                    await setDoc(userDocRef, {
-                        name: newName,
-                        email: newEmail,
-                        photoURL: photoURL,
-                        role: user.role || 'User',
-                        time: user.metadata.creationTime
-                    });
-
-                    toast.success('User profile created successfully');
-                    getAllUserFunction();
-                }
-            } else {
-                throw new Error("No user is currently logged in");
-            }
-        } catch (error) {
-            console.error("Error updating user details: ", error);
-            toast.error("Failed to update user details");
-        } finally {
-            setLoading(false);
+    try {
+      if (user) {
+        // Update displayName and photoURL in Firebase Authentication
+        if (newName !== user.displayName || photoURL !== user.photoURL) {
+          await updateProfile(user, { displayName: newName, photoURL: photoURL });
         }
-    };
 
-    const getAllProductFunction = async () => {
-        setLoading(true);
-        try {
-            const q = query(collection(fireDB, "products"), orderBy('time'));
-            const data = onSnapshot(q, (QuerySnapshot) => {
-                let productArray = [];
-                QuerySnapshot.forEach((doc) => {
-                    productArray.push({ ...doc.data(), id: doc.id });
-                });
-                setGetAllProduct(productArray);
-                setLoading(false);
-            });
-            return () => data;
-        } catch (error) {
-            console.log(error);
-            setLoading(false);
+        const userDocRef = doc(fireDB, "updated_Users", uid);
+        const docSnapshot = await getDoc(userDocRef);
+
+        if (docSnapshot.exists()) {
+          await updateDoc(userDocRef, {
+            name: newName,
+            email: newEmail,
+            photoURL: photoURL,
+          });
+
+          toast.success("User details updated successfully");
+          getAllUserFunction();
+        } else {
+          await setDoc(userDocRef, {
+            name: newName,
+            email: newEmail,
+            photoURL: photoURL,
+            role: user.role || "User",
+            time: user.metadata.creationTime,
+          });
+
+          toast.success("User profile created successfully");
+          getAllUserFunction();
         }
-    };
+      } else {
+        throw new Error("No user is currently logged in");
+      }
+    } catch (error) {
+      console.error("Error updating user details: ", error);
+      toast.error("Failed to update user details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const getAllOrderFunction = async () => {
-        setLoading(true);
-        try {
-            const q = query(collection(fireDB, "order"), orderBy('time'));
-            const data = onSnapshot(q, (QuerySnapshot) => {
-                let orderArray = [];
-                QuerySnapshot.forEach((doc) => {
-                    orderArray.push({ ...doc.data(), id: doc.id });
-                });
-                setGetAllOrder(orderArray);
-                setLoading(false);
-            });
-            return () => data;
-        } catch (error) {
-            console.log(error);
-            setLoading(false);
-        }
-    };
+  // Get All Products
+  const getAllProductFunction = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(fireDB, "products"), orderBy("time"));
+      const data = onSnapshot(q, (QuerySnapshot) => {
+        let productArray = [];
+        QuerySnapshot.forEach((doc) => {
+          productArray.push({ ...doc.data(), id: doc.id });
+        });
+        setGetAllProduct(productArray);
+        setLoading(false);
+      });
+      return () => data;
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
-    const orderDelete = async (id) => {
-        setLoading(true);
-        try {
-            await deleteDoc(doc(fireDB, 'order', id));
-            toast.success('Order Deleted successfully');
-            getAllOrderFunction();
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-            setLoading(false);
-        }
-    };
+  // Get All Orders
+  const getAllOrderFunction = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(fireDB, "order"), orderBy("time"));
+      const data = onSnapshot(q, (QuerySnapshot) => {
+        let orderArray = [];
+        QuerySnapshot.forEach((doc) => {
+          orderArray.push({ ...doc.data(), id: doc.id });
+        });
+        setGetAllOrder(orderArray);
+        setLoading(false);
+      });
+      return () => data;
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
-    const getAllUserFunction = async () => {
-        setLoading(true);
-        try {
-            const q = query(collection(fireDB, "user"), orderBy('time'));
-            const data = onSnapshot(q, (QuerySnapshot) => {
-                let userArray = [];
-                QuerySnapshot.forEach((doc) => {
-                    userArray.push({ ...doc.data(), id: doc.id });
-                });
-                setGetAllUser(userArray);
-                setLoading(false);
-            });
-            return () => data;
-        } catch (error) {
-            console.log(error);
-            setLoading(false);
-        }
-    };
+  // Delete Order
+  const orderDelete = async (id) => {
+    setLoading(true);
+    try {
+      await deleteDoc(doc(fireDB, "order", id));
+      toast.success("Order Deleted successfully");
+      getAllOrderFunction();
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
-    const updateUserRole = async (uid, currentRole) => {
-        setLoading(true);
-        const newRole = currentRole === 'admin' ? 'user' : 'admin';
-        try {
-            const userDocRef = doc(fireDB, "user", uid);
-            await updateDoc(userDocRef, {
-                role: newRole
-            });
-            toast.success(`Role updated to ${newRole}`);
-            getAllUserFunction();
-        } catch (error) {
-            console.error("Error updating role: ", error);
-            toast.error("Failed to update role");
-        } finally {
-            setLoading(false);
-        }
-    };
+  // Get All Users
+  const getAllUserFunction = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(fireDB, "user"), orderBy("time"));
+      const data = onSnapshot(q, (QuerySnapshot) => {
+        let userArray = [];
+        QuerySnapshot.forEach((doc) => {
+          userArray.push({ ...doc.data(), id: doc.id });
+        });
+        setGetAllUser(userArray);
+        setLoading(false);
+      });
+      return () => data;
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
-    const updateOrderStatus = async (orderId, status) => {
-        setLoading(true);
-        try {
-            const orderDocRef = doc(fireDB, "order", orderId);
-            await updateDoc(orderDocRef, {
-                status: status
-            });
-            toast.success('Order status updated successfully');
-            getAllOrderFunction();
-        } catch (error) {
-            console.error("Error updating order status: ", error);
-            toast.error("Failed to update order status");
-        } finally {
-            setLoading(false);
-        }
-    };
+  // Update User Role
+  const updateUserRole = async (uid, currentRole) => {
+    setLoading(true);
+    const newRole = currentRole === "admin" ? "user" : "admin";
+    try {
+      const userDocRef = doc(fireDB, "user", uid);
+      await updateDoc(userDocRef, {
+        role: newRole,
+      });
+      toast.success(`Role updated to ${newRole}`);
+      getAllUserFunction();
+    } catch (error) {
+      console.error("Error updating role: ", error);
+      toast.error("Failed to update role");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const addCoupon = async (coupon) => {
-        try {
-            await addDoc(collection(fireDB, "coupons"), coupon);
-            toast.success("Coupon added successfully!");
-            fetchCoupons();
-        } catch (error) {
-            toast.error("Failed to add coupon!");
-            console.error("Error adding coupon: ", error);
-        }
-    };
+  // Update Order Status
+  const updateOrderStatus = async (orderId, status) => {
+    setLoading(true);
+    try {
+      const orderDocRef = doc(fireDB, "order", orderId);
+      await updateDoc(orderDocRef, {
+        status: status,
+      });
+      toast.success("Order status updated successfully");
+      getAllOrderFunction();
+    } catch (error) {
+      console.error("Error updating order status: ", error);
+      toast.error("Failed to update order status");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const deleteCoupon = async (id) => {
-        try {
-            await deleteDoc(doc(fireDB, "coupons", id));
-            toast.success("Coupon deleted successfully!");
-            fetchCoupons();
-        } catch (error) {
-            toast.error("Failed to delete coupon!");
-            console.error("Error deleting coupon: ", error);
-        }
-    };
+  // Delete User
+  const deleteUser = async (uid) => {
+    setLoading(true);
+    try {
+      // Delete from Firestore
+      const userDocRef = doc(fireDB, "user", uid);
+      await deleteDoc(userDocRef);
 
-    const updateCoupon = async (id, updatedCoupon) => {
-        try {
-            await updateDoc(doc(fireDB, "coupons", id), updatedCoupon);
-            toast.success("Coupon updated successfully!");
-            fetchCoupons();
-        } catch (error) {
-            toast.error("Failed to update coupon!");
-            console.error("Error updating coupon: ", error);
-        }
-    };
+      // Optionally, delete from Authentication if needed
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (user && user.uid === uid) {
+        await fbDeleteUser(user);
+      }
 
-    const deleteUser = async (uid) => {
-        setLoading(true);
-        try {
-            // Delete from Firestore
-            const userDocRef = doc(fireDB, "user", uid);
-            await deleteDoc(userDocRef);
-            
-            // Optionally, delete from Authentication if needed
-            const auth = getAuth();
-            const user = auth.currentUser;
-            if (user && user.uid === uid) {
-                await fbDeleteUser(user);
-            }
-            
-            toast.success("User deleted successfully");
-            getAllUserFunction();
-        } catch (error) {
-            console.error("Error deleting user: ", error);
-            toast.error("Failed to delete user");
-        } finally {
-            setLoading(false);
-        }
-    };
+      toast.success("User deleted successfully");
+      getAllUserFunction();
+    } catch (error) {
+      console.error("Error deleting user: ", error);
+      toast.error("Failed to delete user");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        getAllProductFunction();
-        getAllOrderFunction();
-        getAllUserFunction();
-        fetchCoupons();
-    }, []);
+  // Create User
+  const createUser = async (name, email, password, role) => {
+    setLoading(true);
+    const auth = getAuth();
+    try {
+      const { user } = await auth.createUserWithEmailAndPassword(email, password);
+      await updateProfile(user, { displayName: name });
+      const userDocRef = doc(fireDB, "user", user.uid);
+      await setDoc(userDocRef, {
+        name,
+        email,
+        role,
+        time: Timestamp.now().toDate(),
+      });
+      toast.success(`User ${name} created successfully`);
+      getAllUserFunction();
+    } catch (error) {
+      console.error("Error creating user: ", error);
+      toast.error("Failed to create user");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <MyContext.Provider value={{
-            loading,
-            setLoading,
-            getAllProduct,
-            getAllProductFunction,
-            getAllOrder,
-            orderDelete,
-            getAllUser,
-            updateUserRole,
-            updateUserDetails,
-            updateOrderStatus,
-            coupons, 
-            addCoupon, 
-            deleteCoupon,
-            updateCoupon,
-            fetchCoupons,
-            deleteUser, // Add deleteUser to the context provider
-        }}>
-            {children}
-        </MyContext.Provider>
-    );
+  useEffect(() => {
+    getAllProductFunction();
+    getAllOrderFunction();
+    getAllUserFunction();
+    fetchCoupons();
+  }, []);
+
+  return (
+    <MyContext.Provider
+      value={{
+        loading,
+        setLoading,
+        getAllProduct,
+        getAllProductFunction,
+        getAllOrder,
+        orderDelete,
+        getAllUser,
+        updateUserRole,
+        updateUserDetails,
+        updateOrderStatus,
+        deleteUser,
+        createUser, // Add createUser to the context provider
+      }}
+    >
+      {children}
+    </MyContext.Provider>
+  );
 }
 
 export default MyState;
