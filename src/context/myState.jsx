@@ -1,4 +1,5 @@
-import React, { createContext, useEffect, useState } from "react";
+// MyState.jsx
+import React, { useEffect, useState } from "react";
 import {
   collection,
   deleteDoc,
@@ -14,7 +15,6 @@ import {
 } from "firebase/firestore";
 import {
   getAuth,
-  updateEmail,
   updateProfile,
   deleteUser as fbDeleteUser,
 } from "firebase/auth";

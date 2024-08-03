@@ -1,3 +1,4 @@
+// CartPage.jsx
 import { Timestamp, addDoc, collection } from "firebase/firestore";
 import { Trash } from 'lucide-react';
 import { useEffect, useState } from "react";
@@ -6,8 +7,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router";
 import BuyNowModal from "../../components/buyNowModal/BuyNowModal";
 import Layout from "../../components/layout/Layout";
-import { fireDB } from "../../firebase/FirebaseConfig";
-import { decrementQuantity, deleteFromCart, incrementQuantity } from "../../redux/cartSlice";
+import {
+    decrementQuantity,
+    deleteFromCart,
+    incrementQuantity,
+    orderSuccessful,
+    loadCartFromFirestore,
+    saveCartToFirestore
+} from "../../redux/cartSlice";
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const CartPage = () => {
     const cartItems = useSelector((state) => state.cart);
@@ -49,8 +57,29 @@ const CartPage = () => {
         localStorage.setItem('cart', JSON.stringify(cartItems));
     }, [cartItems]);
 
-    // user
-    const user = JSON.parse(localStorage.getItem('users'));
+    // Load the cart from Firestore whenever the user logs in
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                dispatch(loadCartFromFirestore(user.uid));
+            }
+        });
+
+        return () => unsubscribe();
+    }, [dispatch]);
+
+    // Save the cart to Firestore whenever cartItems change
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                dispatch(saveCartToFirestore({ userId: user.uid, cartItems }));
+            }
+        });
+
+        return () => unsubscribe();
+    }, [dispatch, cartItems]);
 
     // Buy Now Function
     const [addressInfo, setAddressInfo] = useState({
@@ -69,10 +98,15 @@ const CartPage = () => {
         )
     });
 
-    const buyNowFunction = () => {
+    const buyNowFunction = async () => {
         // validation 
         if (addressInfo.name === "" || addressInfo.address === "" || addressInfo.pincode === "" || addressInfo.mobileNumber === "") {
             return toast.error("All Fields are required");
+        }
+
+        const user = getAuth().currentUser;
+        if (!user) {
+            return toast.error("User not authenticated");
         }
 
         // Order Info 
@@ -94,16 +128,18 @@ const CartPage = () => {
         };
         try {
             const orderRef = collection(fireDB, 'order');
-            addDoc(orderRef, orderInfo);
+            await addDoc(orderRef, orderInfo);
             setAddressInfo({
                 name: "",
                 address: "",
                 pincode: "",
                 mobileNumber: "",
             });
+            dispatch(orderSuccessful()); // Clear the cart after placing the order
             toast.success("Order Placed Successfully");
         } catch (error) {
             console.log(error);
+            toast.error("Failed to place order. Please try again.");
         }
     };
 
@@ -219,7 +255,7 @@ const CartPage = () => {
                                 </dl>
                                 <div className="px-2 pb-4 font-medium text-green-700">
                                     <div className="flex gap-4 mb-6">
-                                        {user
+                                        {getAuth().currentUser
                                             ? <BuyNowModal
                                                 addressInfo={addressInfo}
                                                 setAddressInfo={setAddressInfo}
