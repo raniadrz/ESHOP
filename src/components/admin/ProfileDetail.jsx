@@ -128,7 +128,8 @@ const ProfileDetail = () => {
         }
 
         // Update user details (name and avatar URL in Firestore)
-        await context.updateUserDetails(user.uid, newName, newEmail, avatar);
+        const updatedName = newName.trim() || user.displayName;
+        await context.updateUserDetails(user.uid, updatedName, newEmail, avatar);
         toast.success('Profile updated successfully');
       } catch (error) {
         console.error('Failed to update profile: ', error);
@@ -209,6 +210,7 @@ const ProfileDetail = () => {
                 fullWidth
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
+                placeholder={user?.displayName || 'Enter your name'}
               />
             </Grid>
             <Grid item xs={12}>
