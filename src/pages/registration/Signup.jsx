@@ -1,16 +1,16 @@
-/* eslint-disable react/no-unescaped-entities */
+import React, { useContext, useState } from 'react';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
-import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import Loader from "../../components/loader/Loader";
 import myContext from "../../context/myContext";
 import { auth, fireDB } from "../../firebase/FirebaseConfig";
+import './Signup.css'; // Import your CSS file
 
 const Signup = () => {
     const context = useContext(myContext);
-    const {loading, setLoading } = context;
+    const { loading, setLoading } = context;
 
     // navigate 
     const navigate = useNavigate();
@@ -30,7 +30,8 @@ const Signup = () => {
     const userSignupFunction = async () => {
         // validation 
         if (userSignup.name === "" || userSignup.email === "" || userSignup.password === "") {
-            toast.error("All Fields are required")
+            toast.error("All Fields are required");
+            return; // add a return here to prevent further execution
         }
 
         setLoading(true);
@@ -52,39 +53,39 @@ const Signup = () => {
                         year: "numeric",
                     }
                 )
-            }
+            };
 
-            // create user Refrence
-            const userRefrence = collection(fireDB, "user")
+            // create user Reference
+            const userReference = collection(fireDB, "user");
 
             // Add User Detail
-            addDoc(userRefrence, user);
+            await addDoc(userReference, user); // add await to ensure this completes
 
             setUserSignup({
                 name: "",
                 email: "",
                 password: ""
-            })
+            });
 
             toast.success("Signup Successfully");
 
             setLoading(false);
-            navigate('/login')
+            navigate('/login');
         } catch (error) {
-            console.log(error);
+            console.error(error);
             setLoading(false);
+            toast.error("Signup failed. Please try again.");
         }
+    };
 
-    }
     return (
-        <div className='flex justify-center items-center h-screen'>
-            {loading && <Loader/>}
+        <div className='bg-image'>
+            {loading && <Loader />}
             {/* Login Form  */}
-            <div className="login_Form bg-blue-50 px-8 py-6 border border-blue-100 rounded-xl shadow-md">
-
+            <div className="login-form px-8 py-6 border border-blue-100 rounded-xl shadow-md">
                 {/* Top Heading  */}
                 <div className="mb-5">
-                    <h2 className='text-center text-2xl font-bold text-blue-500 '>
+                    <h2 className='text-center text-2xl font-bold text-blue-500'>
                         Signup
                     </h2>
                 </div>
@@ -99,9 +100,9 @@ const Signup = () => {
                             setUserSignup({
                                 ...userSignup,
                                 name: e.target.value
-                            })
+                            });
                         }}
-                        className='bg-blue-50 border border-blue-200 px-2 py-2 w-96 rounded-md outline-none placeholder-blue-200'
+                        className='bg-blue-50 border border-blue-400 px-2 py-2 w-96 rounded-md outline-none placeholder-blue-200'
                     />
                 </div>
 
@@ -115,9 +116,9 @@ const Signup = () => {
                             setUserSignup({
                                 ...userSignup,
                                 email: e.target.value
-                            })
+                            });
                         }}
-                        className='bg-blue-50 border border-blue-200 px-2 py-2 w-96 rounded-md outline-none placeholder-blue-200'
+                        className='bg-blue-50 border border-blue-400 px-2 py-2 w-96 rounded-md outline-none placeholder-blue-200'
                     />
                 </div>
 
@@ -131,9 +132,9 @@ const Signup = () => {
                             setUserSignup({
                                 ...userSignup,
                                 password: e.target.value
-                            })
+                            });
                         }}
-                        className='bg-blue-50 border border-blue-200 px-2 py-2 w-96 rounded-md outline-none placeholder-blue-200'
+                        className='bg-blue-50 border border-blue-400 px-2 py-2 w-96 rounded-md outline-none placeholder-blue-200'
                     />
                 </div>
 
@@ -142,7 +143,7 @@ const Signup = () => {
                     <button
                         type='button'
                         onClick={userSignupFunction}
-                        className='bg-blue-500 hover:bg-blue-600 w-full text-white text-center py-2 font-bold rounded-md '
+                        className='g-blue-500 hover:bg-blue-600 w-full text-white text-center py-2 font-bold rounded-md'
                     >
                         Signup
                     </button>
@@ -151,7 +152,6 @@ const Signup = () => {
                 <div>
                     <h2 className='text-black'>Have an account <Link className=' text-blue-500 font-bold' to={'/login'}>Login</Link></h2>
                 </div>
-
             </div>
         </div>
     );

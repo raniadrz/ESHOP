@@ -2,63 +2,36 @@ import React, { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
-import { FaFilter, FaTimes } from "react-icons/fa"; // Import filter and close icons
 import Layout from "../../components/layout/Layout";
 import Loader from "../../components/loader/Loader";
 import myContext from "../../context/myContext";
 import { addToCart, deleteFromCart } from "../../redux/cartSlice";
 
-const CategoryPage = () => {
+const FilterCategoryPage = () => {
   const { categoryname } = useParams();
   const context = useContext(myContext);
   const { getAllProduct, loading } = context;
 
   const navigate = useNavigate();
 
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [selectedCategory2, setSelectedCategory2] = useState([]);
-  const [selectedSubCategory, setSelectedSubCategory] = useState([]);
-  const [availableCategory2, setAvailableCategory2] = useState([]);
-  const [availableSubCategories, setAvailableSubCategories] = useState([]);
-  const [showFilters, setShowFilters] = useState(false); // State for showing/hiding filters
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [availableBrands, setAvailableBrands] = useState([]);
 
   useEffect(() => {
-    // Extract available Category2 and SubCategory from the product list for the selected category
-    const category2Set = new Set();
-    const subCategorySet = new Set();
+    // Extract available brands from the product list
+    const brands = Array.from(new Set(getAllProduct.map((product) => product.brand)));
+    setAvailableBrands(brands);
+  }, [getAllProduct]);
 
-    getAllProduct.forEach((product) => {
-      if (product.category.includes(categoryname)) {
-        category2Set.add(product.category2);
-        subCategorySet.add(product.subcategory);
-      }
-    });
-
-    setAvailableCategory2(Array.from(category2Set));
-    setAvailableSubCategories(Array.from(subCategorySet));
-  }, [getAllProduct, categoryname]);
-
-  useEffect(() => {
-    const filtered = getAllProduct.filter((product) => {
-      return (
-        product.category.includes(categoryname) &&
-        product.price >= priceRange[0] &&
-        product.price <= priceRange[1] &&
-        (selectedCategory2.length === 0 ||
-          selectedCategory2.includes(product.category2)) &&
-        (selectedSubCategory.length === 0 ||
-          selectedSubCategory.includes(product.subcategory))
-      );
-    });
-    setFilteredProducts(filtered);
-  }, [
-    getAllProduct,
-    categoryname,
-    priceRange,
-    selectedCategory2,
-    selectedSubCategory,
-  ]);
+  const filterProduct = getAllProduct.filter((obj) => {
+    return (
+      obj.category.includes(categoryname) &&
+      obj.price >= priceRange[0] &&
+      obj.price <= priceRange[1] &&
+      (selectedBrands.length === 0 || selectedBrands.includes(obj.brand))
+    );
+  });
 
   const cartItems = useSelector((state) => state.cart);
   const dispatch = useDispatch();
@@ -77,19 +50,11 @@ const CategoryPage = () => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const handleCategory2Selection = (category) => {
-    setSelectedCategory2((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
-    );
-  };
-
-  const handleSubCategorySelection = (subCategory) => {
-    setSelectedSubCategory((prev) =>
-      prev.includes(subCategory)
-        ? prev.filter((s) => s !== subCategory)
-        : [...prev, subCategory]
+  const handleBrandSelection = (brand) => {
+    setSelectedBrands((prevBrands) =>
+      prevBrands.includes(brand)
+        ? prevBrands.filter((b) => b !== brand)
+        : [...prevBrands, brand]
     );
   };
 
@@ -102,28 +67,11 @@ const CategoryPage = () => {
     );
   };
 
-  const toggleFilters = () => {
-    setShowFilters(!showFilters);
-  };
-
   return (
     <Layout>
-      <div className="flex flex-col md:flex-row mt-10">
-        {/* Button to toggle filter visibility */}
-        <button
-          onClick={toggleFilters}
-          className="flex items-center justify-center px-4 py-2 mb-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-md md:hidden"
-        >
-          {showFilters ? <FaTimes className="mr-2" /> : <FaFilter className="mr-2" />}
-          {showFilters ? "Close Filters" : "Open Filters"}
-        </button>
-
+      <div className="flex mt-10">
         {/* Filter Sidebar */}
-        <aside
-          className={`w-full md:w-1/4 p-4 bg-gray-100 ${
-            showFilters ? "block" : "hidden"
-          } md:block`}
-        >
+        <aside className="w-1/4 p-4 bg-gray-100">
           <h2 className="text-xl font-bold mb-4">Filters</h2>
 
           {/* Price Range Filter */}
@@ -147,43 +95,26 @@ const CategoryPage = () => {
             />
           </div>
 
-          {/* Category2 Filter */}
+          {/* Brand Filter */}
           <div className="mb-4">
-            <h3 className="font-semibold">Category2</h3>
-            {availableCategory2.map((category) => (
-              <div key={category} className="flex items-center mb-2">
+            <h3 className="font-semibold">Brand</h3>
+            {availableBrands.map((brand) => (
+              <div key={brand} className="flex items-center mb-2">
                 <input
                   type="checkbox"
-                  id={category}
+                  id={brand}
                   className="mr-2"
-                  checked={selectedCategory2.includes(category)}
-                  onChange={() => handleCategory2Selection(category)}
+                  checked={selectedBrands.includes(brand)}
+                  onChange={() => handleBrandSelection(brand)}
                 />
-                <label htmlFor={category}>{category}</label>
-              </div>
-            ))}
-          </div>
-
-          {/* SubCategory Filter */}
-          <div className="mb-4">
-            <h3 className="font-semibold">SubCategory</h3>
-            {availableSubCategories.map((subCategory) => (
-              <div key={subCategory} className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  id={subCategory}
-                  className="mr-2"
-                  checked={selectedSubCategory.includes(subCategory)}
-                  onChange={() => handleSubCategorySelection(subCategory)}
-                />
-                <label htmlFor={subCategory}>{subCategory}</label>
+                <label htmlFor={brand}>{brand}</label>
               </div>
             ))}
           </div>
         </aside>
 
         {/* Main Content */}
-        <main className="w-full md:w-3/4 p-4">
+        <main className="w-3/4 p-4">
           {/* Heading */}
           <div className="">
             <h1 className="text-center mb-5 text-2xl font-semibold first-letter:uppercase">
@@ -200,9 +131,9 @@ const CategoryPage = () => {
             <section className="text-gray-600 body-font">
               <div className="container px-5 py-5 mx-auto">
                 <div className="flex flex-wrap -m-4 justify-center">
-                  {filteredProducts.length > 0 ? (
+                  {filterProduct.length > 0 ? (
                     <>
-                      {filteredProducts.map((item, index) => {
+                      {filterProduct.map((item, index) => {
                         const { id, title, price, productImageUrl } = item;
                         return (
                           <div key={index} className="p-4 w-full md:w-1/4">
@@ -271,4 +202,4 @@ const CategoryPage = () => {
   );
 };
 
-export default CategoryPage;
+export default FilterCategoryPage;
