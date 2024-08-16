@@ -1,10 +1,12 @@
-import { useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import myContext from "../../context/myContext";
 import { addToCart } from "../../redux/cartSlice";
 import Loader from "../loader/Loader";
+import NewReleasesIcon from '@mui/icons-material/NewReleases';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 const HomePageProductCard = () => {
     const navigate = useNavigate();
@@ -38,13 +40,26 @@ const HomePageProductCard = () => {
                     </div>
                     <div className="flex flex-wrap -m-4">
                         {getAllProduct.slice(0, 12).map((item, index) => {
-                            const { id, title, price, productImageUrl } = item;
+                            const { id, title, price, productImageUrl, productType } = item;
                             return (
                                 <div key={index} className="p-4 w-1/2 md:w-1/6">
-                                    <div className="h-2/2 border border-blue-100 rounded-xl overflow-hidden shadow-md cursor-pointer">
+                                    <div className="relative h-2/2 border border-blue-100 rounded-xl overflow-hidden shadow-md cursor-pointer">
+                                        
+                                        {/* Conditionally render product type icons */}
+                                        {productType === "New Product" && (
+                                            <div className="absolute top-2 left-2">
+                                                <NewReleasesIcon style={{ color: 'green' }} />
+                                            </div>
+                                        )}
+                                        {productType === "Sales" && (
+                                            <div className="absolute top-2 right-2">
+                                                <LocalOfferIcon style={{ color: 'red' }} />
+                                            </div>
+                                        )}
+
                                         <img
                                             onClick={() => navigate(`/productinfo/${id}`)}
-                                            className="w-48 h-48 scale-down"
+                                            className="w-48 h-48 object-cover mx-auto"
                                             src={productImageUrl}
                                             alt="product"
                                         />

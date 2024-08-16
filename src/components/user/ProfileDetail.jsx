@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import myContext from '../../context/myContext';
-import Layout from "../../components/layout/Layout";
+import Layout from "../layout/Layout";
 import { getAuth, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import toast from 'react-hot-toast';

@@ -27,10 +27,6 @@ const category = [
         image: 'https://www.thoughtco.com/thmb/KTKF0mDSAXCdLJQcAJq7QLSwBFw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-622013488-55a1fad50d93429fb927087e1f18cff8.jpg',
         name: 'Reptile'
     },
-    {
-        image: 'https://static.vecteezy.com/system/resources/previews/003/098/621/non_2x/best-price-sticker-badge-discount-sale-for-promotion-free-vector.jpg',
-        name: 'Sales'
-    }
 ]
 
 const Category = () => {

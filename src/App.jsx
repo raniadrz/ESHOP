@@ -24,7 +24,7 @@ import About from "./pages/footer/about/About";
 import Contact from "./pages/footer/contact/Contact";
 import PPolicy from "./pages/footer/privacyPolicy/privacyPolicy";
 import ReturnPolicy from './pages/footer/returnPolicy/ReturnPolicy';
-import UserSettings from './components/admin/ProfileDetail';
+import UserSettings from './components/user/ProfileDetail';
 
 function  App () {
   return (

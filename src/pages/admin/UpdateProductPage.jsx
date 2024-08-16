@@ -13,7 +13,6 @@ const categoryList = [
     { name: 'Bird' },
     { name: 'Fish' },
     { name: 'Reptile' },
-    { name: 'Sales' }
 ];
 
 const SubCategoryList = [
@@ -47,7 +46,8 @@ const UpdateProductPage = () => {
             month: "short",
             day: "2-digit",
             year: "numeric",
-        })
+        }),
+        productType: "New Product", // Add productType state
     });
 
     const getSingleProductFunction = async () => {
@@ -71,7 +71,8 @@ const UpdateProductPage = () => {
                         month: "short",
                         day: "2-digit",
                         year: "numeric",
-                    })
+                    }),
+                    productType: productData.productType || "New Product", // Set productType from fetched data
                 });
             }
             setLoading(false);
@@ -128,6 +129,38 @@ const UpdateProductPage = () => {
                             Update Product
                         </h2>
                     </div>
+
+                    {/* Radio Group for Product Type */}
+                    <div className="mb-3">
+                        <label className="text-pink-300 font-bold">Product Type:</label>
+                        <div className="flex gap-4">
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    value="New Product"
+                                    checked={product.productType === "New Product"}
+                                    onChange={(e) =>
+                                        setProduct({ ...product, productType: e.target.value })
+                                    }
+                                    className="mr-2"
+                                />
+                                New Product
+                            </label>
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    value="Sales"
+                                    checked={product.productType === "Sales"}
+                                    onChange={(e) =>
+                                        setProduct({ ...product, productType: e.target.value })
+                                    }
+                                    className="mr-2"
+                                />
+                                Sales
+                            </label>
+                        </div>
+                    </div>
+
                     <div className="mb-3">
                         <input
                             type="text"

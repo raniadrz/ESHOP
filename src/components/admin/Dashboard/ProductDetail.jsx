@@ -41,6 +41,7 @@ const ProductDetail = () => {
     category2: item.category2,
     subcategory: item.subcategory,
     date: item.date,
+    productType: item.productType || 'N/A', // Add productType to rows
   }));
 
   const columns = [
@@ -51,6 +52,13 @@ const ProductDetail = () => {
     { field: 'subcategory', headerName: 'SubCategory', flex: 1.5, headerAlign: 'center', align: 'center' },
     { field: 'date', headerName: 'Date', flex: 2, headerAlign: 'center', align: 'center' },
     { field: 'price', headerName: 'Price', flex: 1, headerAlign: 'center', align: 'center' },
+    {
+      field: 'productType', // New column for productType
+      headerName: 'Product Type',
+      flex: 1.5,
+      headerAlign: 'center',
+      align: 'center',
+    },
     {
       field: 'image',
       headerName: 'Image',

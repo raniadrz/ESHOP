@@ -7,6 +7,8 @@ import Layout from "../../components/layout/Layout";
 import Loader from "../../components/loader/Loader";
 import myContext from "../../context/myContext";
 import { addToCart, deleteFromCart } from "../../redux/cartSlice";
+import NewReleasesIcon from '@mui/icons-material/NewReleases';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 const CategoryPage = () => {
   const { categoryname } = useParams();
@@ -203,13 +205,26 @@ const CategoryPage = () => {
                   {filteredProducts.length > 0 ? (
                     <>
                       {filteredProducts.map((item, index) => {
-                        const { id, title, price, productImageUrl } = item;
+                        const { id, title, price, productImageUrl, productType } = item;
                         return (
                           <div key={index} className="p-4 w-full md:w-1/4">
-                            <div className="h-full border border-gray-300 rounded-xl overflow-hidden shadow-md cursor-pointer">
+                            <div className="relative h-full border border-gray-300 rounded-xl overflow-hidden shadow-md cursor-pointer">
+                              
+                              {/* Conditionally render product type icons */}
+                              {productType === "New Product" && (
+                                <div className="absolute top-2 left-2">
+                                  <NewReleasesIcon style={{ color: 'green' }} />
+                                </div>
+                              )}
+                              {productType === "Sales" && (
+                                <div className="absolute top-2 right-2">
+                                  <LocalOfferIcon style={{ color: 'red' }} />
+                                </div>
+                              )}
+                              
                               <img
                                 onClick={() => navigate(`/productinfo/${id}`)}
-                                className="lg:h-80 h-96 w-full"
+                                className="lg:h-80 h-96 w-full object-cover"
                                 src={productImageUrl}
                                 alt="product"
                               />
