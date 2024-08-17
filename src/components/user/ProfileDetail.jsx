@@ -1,45 +1,36 @@
-import React, { useContext, useState, useEffect } from 'react';
-import myContext from '../../context/myContext';
-import Layout from "../layout/Layout";
-import { getAuth, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from 'firebase/auth';
+import React, { useContext, useState, useEffect } from "react";
+import Layout from "../../components/layout/Layout";
+import myContext from "../../context/myContext";
+import Loader from "../../components/loader/Loader";
+import { getAuth, updateProfile } from "firebase/auth";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore"; 
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import toast from 'react-hot-toast';
+import { fireDB } from "../../firebase/FirebaseConfig"; // Ensure you import your Firebase config
 import {
-  Container,
-  Box,
-  Typography,
   Avatar,
-  TextField,
-  Button,
-  Paper,
-  CssBaseline,
   Grid,
   IconButton,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import toast from 'react-hot-toast';
 
-const Root = styled(Container)(({ theme }) => ({
-  marginTop: theme.spacing(5),
-}));
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: theme.shape.borderRadius,
-}));
-
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  width: theme.spacing(15),
-  height: theme.spacing(15),
-  margin: 'auto',
-}));
+const defaultAvatars = [
+  'https://cdn-icons-png.flaticon.com/128/2202/2202112.png',
+  'https://cdn-icons-png.flaticon.com/128/236/236831.png',
+  'https://cdn-icons-png.flaticon.com/128/2922/2922510.png',
+  'https://cdn-icons-png.flaticon.com/128/2922/2922656.png',
+  'https://cdn-icons-png.flaticon.com/128/2922/2922522.png',
+  'https://cdn-icons-png.flaticon.com/128/2922/2922561.png',
+  'https://cdn-icons-png.flaticon.com/128/2922/2922715.png'
+];
 
 const AvatarCollage = styled(Grid)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   flexWrap: 'wrap',
   gap: theme.spacing(2),
+  marginTop: theme.spacing(2),
 }));
 
 const CollageAvatar = styled(Avatar)(({ theme }) => ({
@@ -55,226 +46,130 @@ const CollageAvatar = styled(Avatar)(({ theme }) => ({
   },
 }));
 
-const SubmitButton = styled(Button)(({ theme }) => ({
-  marginLeft: theme.spacing(2),
-  height: '56px', // Ensure the button matches the TextField's height
-}));
-
-const defaultAvatars = [
-  'https://cdn-icons-png.flaticon.com/128/2202/2202112.png',
-  'https://cdn-icons-png.flaticon.com/128/236/236831.png',
-  'https://cdn-icons-png.flaticon.com/128/2922/2922510.png',
-  'https://cdn-icons-png.flaticon.com/128/2922/2922656.png',
-  'https://cdn-icons-png.flaticon.com/128/2922/2922522.png',
-  'https://cdn-icons-png.flaticon.com/128/2922/2922561.png',
-  'https://cdn-icons-png.flaticon.com/128/2922/2922715.png'
-];
-
 const ProfileDetail = () => {
-  const context = useContext(myContext);
-  const auth = getAuth();
-  const user = auth.currentUser;
+    const auth = getAuth();
+    const user = JSON.parse(localStorage.getItem('users'));
 
-  const [newPassword, setNewPassword] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newName, setNewName] = useState(user?.displayName || '');
-  const [newEmail, setNewEmail] = useState(user?.email || '');
-  const [avatar, setAvatar] = useState(user?.photoURL || defaultAvatars[0]);
-  const [imageFile, setImageFile] = useState(null);
+    const context = useContext(myContext);
+    const { loading, getAllOrder } = context;
 
-  useEffect(() => {
-    if (user) {
-      setNewName(user.displayName || '');
-      setNewEmail(user.email || '');
-      setAvatar(user.photoURL || defaultAvatars[0]);
-    }
-  }, [user]);
+    // Group orders by order id
+    const groupedOrders = getAllOrder
+        .filter((order) => order.userid === user?.uid)
+        .reduce((acc, order) => {
+            if (!acc[order.id]) {
+                acc[order.id] = { ...order, items: [] };
+            }
+            acc[order.id].items.push(...order.cartItems);
+            return acc;
+        }, {});
 
-  const reauthenticateUser = async () => {
-    if (!currentPassword) {
-      toast.error('Please enter your current password for re-authentication.');
-      return false;
-    }
+    return (
+        <Layout>
+            <div className="container mx-auto lg:py-10">
+                {/* Top  */}
+                <div className="top ">
+                    {/* main  */}
+                    <div className="bottom mt-8">
+                    <div className="mx-auto max-w-6xl">
+                        {/* User Info */}
+                        <div className="p-4 bg-blue-50 py-5 rounded-xl border border-blue-100">
+                            <h1 className="grid-cols-2 sm:grid-cols-4 md:grid-cols-1">
+                                <span className="text-sm font-semibold text-black">Name:</span> {user?.name}
+                            </h1>
+                            <h1 className="grid-cols-2 sm:grid-cols-4 md:grid-cols-1">
+                                <span className="text-sm font-semibold text-black">Email:</span> {user?.email}
+                            </h1>
+                            <h1 className="grid-cols-2 sm:grid-cols-4 md:grid-cols-1">
+                                <span className="text-sm font-semibold text-black">Date:</span> {user?.date}
+                            </h1>
+                            <h1 className="grid-cols-2 sm:grid-cols-4 md:grid-cols-1">
+                                <span className="text-sm font-semibold text-black">Role:</span> {user?.role}
+                            </h1>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            
+                {/* Bottom */}
+                <div className="bottom mt-8">
+                    <div className="mx-auto max-w-6xl">
+                        <h2 className="text-2xl lg:text-3xl font-bold">Order History</h2>
+                        <div className="flex justify-center relative top-10">
+                            {loading && <Loader />}
+                        </div>
 
-    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+                        {/* Order History */}
+                        {Object.values(groupedOrders).map((order, index) => (
+                            <div key={index} className="mt-4 flex flex-col overflow-hidden rounded-xl border border-blue-100 md:flex-row">
+                                {/* Order Summary */}
+                                <div className="w-full border-r border-blue-100 bg-blue-50 md:max-w-xs">
+                                    <div className="p-10">
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-1">
+                                            <div className="mb-5">
+                                                <div className="text-sm font-semibold text-black">Order Id</div>
+                                                <div className="text-sm font-medium text-gray-900">#{order.id}</div>
+                                            </div>
 
-    try {
-      await reauthenticateWithCredential(user, credential);
-      return true;
-    } catch (error) {
-      console.error('Re-authentication failed: ', error);
-      toast.error('Re-authentication failed. Please check your password.');
-      return false;
-    }
-  };
+                                            <div className="mb-5 ">
+                                                <div className="text-sm font-semibold">Date</div>
+                                                <div className="text-sm font-medium text-gray-900">{order.date}</div>
+                                            </div>
 
-  const handleUpdateProfile = async () => {
-    if (user) {
-      try {
-        // Re-authenticate the user if required
-        const isAuthenticated = await reauthenticateUser();
-        if (!isAuthenticated) return;
+                                            <div className="mb-5">
+                                                <div className="text-sm font-semibold">Total Amount</div>
+                                                <div className="text-sm font-medium text-gray-900">
+                                                     {order.items.reduce((total, item) => total + item.price * item.quantity, 0)}€
+                                                </div>
+                                            </div>
 
-        // Update password if changed
-        if (newPassword) {
-          await updatePassword(user, newPassword);
-          toast.success('Password updated successfully');
-        }
+                                            <div className="mb-5">
+                                                <div className="text-sm font-semibold">Order Status</div>
+                                                <div className={`text-sm font-medium ${order.status === 'pending' ? 'text-red-800' : 'text-green-800'} first-letter:uppercase`}>
+                                                    {order.status}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* Order Items */}
+                                <div className="flex">
+                                    <div className="p-5">
+                                        <ul className="-my-7 divide-y divide-gray-200">
+                                            {order.items.map((item, idx) => (
+                                                <li key={idx} className="flex flex-col justify-between space-x-5 py-7 md:flex-row">
+                                                    <div className="flex flex-1 items-stretch">
+                                                        <div className="flex-shrink-0">
+                                                            <img
+                                                                className="h-20 w-20 rounded-lg border border-gray-200 object-contain"
+                                                                src={item.productImageUrl}
+                                                                alt={item.title}
+                                                            />
+                                                        </div>
 
-        // Upload new avatar if a new image is selected
-        if (imageFile) {
-          const photoURL = await uploadAvatarToFirebase(imageFile);
-          setAvatar(photoURL);
-        }
+                                                        <div className="ml-2 flex flex-col justify-between">
+                                                            <div className="flex-1">
+                                                                <p className="text-sm font-bold text-gray-900">{item.title}</p>
+                                                                <p className="mt-1 text-sm font-medium text-gray-500">{item.category} x {item.quantity}</p>
+                                                             </div>
+                                                        </div>
+                                                    </div>
 
-        // Update user details (name and avatar URL in Firestore)
-        const updatedName = newName.trim() || user.displayName;
-        await context.updateUserDetails(user.uid, updatedName, newEmail, avatar);
-        toast.success('Profile updated successfully');
-      } catch (error) {
-        console.error('Failed to update profile: ', error);
-        toast.error('Failed to update profile');
-      }
-    } else {
-      console.error('User ID is missing');
-    }
-  };
-
-  const uploadAvatarToFirebase = async (file) => {
-    const storage = getStorage();
-    const storageRef = ref(storage, `avatars/${user.uid}_${file.name}`);
-    await uploadBytes(storageRef, file);
-    return getDownloadURL(storageRef);
-  };
-
-  const handleAvatarChange = (avatarUrl) => {
-    setAvatar(avatarUrl);
-    setImageFile(null); // Remove custom image if a default avatar is selected
-  };
-
-  const handleImageFileChange = (e) => {
-    const file = e.target.files[0];
-    setImageFile(file);
-    setAvatar(URL.createObjectURL(file)); // Show preview of the selected image
-  };
-
-  // Function to format the date string
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(); // Formats date to MM/DD/YYYY by default
-  };
-
-  return (
-    <Layout>
-      <CssBaseline />
-      <Root maxWidth="md">
-        <StyledPaper elevation={3}>
-          <Box mb={5} textAlign="center">
-            <Typography variant="h4" component="h1" color="primary" gutterBottom>
-              Profile Setup
-            </Typography>
-          </Box>
-
-          <Box textAlign="center" mb={1}>
-            <StyledAvatar src={avatar} alt="User Avatar" />
-            <input
-              accept="image/*"
-              style={{ display: 'none' }}
-              id="upload-avatar"
-              type="file"
-              onChange={handleImageFileChange}
-            />
-            <label htmlFor="upload-avatar">
-              <IconButton color="primary" component="span">
-                <PhotoCamera />
-              </IconButton>
-            </label>
-          </Box>
-
-          <AvatarCollage container spacing={2}>
-            {defaultAvatars.map((avatarUrl, index) => (
-              <CollageAvatar
-                key={index}
-                src={avatarUrl}
-                onClick={() => handleAvatarChange(avatarUrl)}
-                className={avatar === avatarUrl ? 'selected' : ''}
-              />
-            ))}
-          </AvatarCollage>
-
-          <Grid container spacing={4} mt={2}>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                label="Name"
-                fullWidth
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder={user?.displayName || 'Enter your name'}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                label="Email"
-                fullWidth
-                value={newEmail}
-                InputProps={{
-                  readOnly: true,
-                }}
-                helperText="Email cannot be changed"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h6" align="left">
-                <strong>Date: </strong>
-                {user?.metadata.creationTime ? formatDate(user.metadata.creationTime) : 'N/A'}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h6" align="left">
-                <strong>Role: </strong>
-                {user?.role || 'User'}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                label="New Password"
-                type="password"
-                fullWidth
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container alignItems="center">
-                <Grid item xs={8}>
-                  <TextField
-                    variant="outlined"
-                    label="Current Password"
-                    type="password"
-                    fullWidth
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <SubmitButton
-                    variant="contained"
-                    color="primary"
-                    onClick={handleUpdateProfile}
-                  >
-                    Update Profile
-                  </SubmitButton>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </StyledPaper>
-      </Root>
-    </Layout>
-  );
+                                                    <div className="ml-auto flex flex-col items-end justify-between">
+                                                        <p className="text-right text-sm font-bold text-gray-900"> {item.price}€</p>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </Layout>
+    );
 };
 
 export default ProfileDetail;
