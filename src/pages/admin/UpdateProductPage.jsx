@@ -1,10 +1,11 @@
-import { Timestamp, doc, getDoc, setDoc } from "firebase/firestore";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { Button, Form, Header, Segment, Step } from "semantic-ui-react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router";
 import Loader from "../../components/loader/Loader";
 import myContext from "../../context/myContext";
 import { fireDB } from "../../firebase/FirebaseConfig";
+import { Timestamp, doc, getDoc, setDoc } from "firebase/firestore";
 
 const categoryList = [
     { name: 'Dog' },
@@ -15,7 +16,7 @@ const categoryList = [
     { name: 'Reptile' },
 ];
 
-const SubCategoryList = [
+const subCategoryList = [
     { name: 'Τροφές' },
     { name: 'Κλινικές Τροφές' },
     { name: 'Μεταφορά-Διαμονή' },
@@ -28,7 +29,6 @@ const SubCategoryList = [
 const UpdateProductPage = () => {
     const context = useContext(myContext);
     const { loading, setLoading, getAllProductFunction } = context;
-
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -47,8 +47,14 @@ const UpdateProductPage = () => {
             day: "2-digit",
             year: "numeric",
         }),
-        productType: "New Product", // Add productType state
+        productType: "New Product",
     });
+
+    const [step, setStep] = useState(1); // Track the current step
+
+    useEffect(() => {
+        getSingleProductFunction();
+    }, [id]);
 
     const getSingleProductFunction = async () => {
         setLoading(true);
@@ -72,13 +78,13 @@ const UpdateProductPage = () => {
                         day: "2-digit",
                         year: "numeric",
                     }),
-                    productType: productData.productType || "New Product", // Set productType from fetched data
+                    productType: productData.productType || "New Product",
                 });
             }
-            setLoading(false);
         } catch (error) {
             console.error("Error fetching product:", error);
             toast.error("Failed to fetch product data.");
+        } finally {
             setLoading(false);
         }
     };
@@ -93,159 +99,223 @@ const UpdateProductPage = () => {
         } catch (error) {
             console.error("Error updating product:", error);
             toast.error("Failed to update product.");
+        } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        getSingleProductFunction();
-    }, [id]);
-
-    const backgroundImageUrl = 'https://t3.ftcdn.net/jpg/04/81/85/46/360_F_481854656_gHGTnBscKXpFEgVTwAT4DL4NXXNhDKU9.jpg'; //Background image URL
+    const nextStep = () => setStep((prev) => prev + 1);
+    const prevStep = () => setStep((prev) => prev - 1);
 
     return (
-        <div style={{ 
-            backgroundImage: `url(${backgroundImageUrl})`, 
-            backgroundSize: 'cover', 
-            backgroundPosition: 'center', 
-            backgroundRepeat: 'no-repeat', 
-            height: '100vh', 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center' 
-        }}>
+        <div
+            style={{
+                backgroundImage: `url(https://t3.ftcdn.net/jpg/04/81/85/46/360_F_481854656_gHGTnBscKXpFEgVTwAT4DL4NXXNhDKU9.jpg)`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                height: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '20px',
+            }}
+        >
             {loading && <Loader />}
             {!loading && (
-                <div className="login_Form px-8 py-6 border border-pink-100 rounded-xl shadow-md" style={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)', 
-                    backdropFilter: 'blur(10px)', 
-                    WebkitBackdropFilter: 'blur(10px)', 
-                    borderRadius: '10px', 
-                    border: '1px solid rgba(255, 255, 255, 0.18)',
-                    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)' 
-                }}>
-                    <div className="mb-5">
-                        <h2 className='text-center text-2xl font-bold text-pink-500 '>
-                            Update Product
-                        </h2>
-                    </div>
+                <Segment style={{ maxWidth: '600px', width: '100%' }}>
+                    <Header as="h2" textAlign="center" color="pink">
+                        Update Product
+                    </Header>
+                    <Step.Group fluid>
+                        <Step active={step === 1}>
+                            <Step.Content>
+                                <Step.Title>Basic Info</Step.Title>
+                            </Step.Content>
+                        </Step>
+                        <Step active={step === 2}>
+                            <Step.Content>
+                                <Step.Title>Category</Step.Title>
+                            </Step.Content>
+                        </Step>
+                        <Step active={step === 3}>
+                            <Step.Content>
+                                <Step.Title>Details</Step.Title>
+                            </Step.Content>
+                        </Step>
+                        <Step active={step === 4}>
+                            <Step.Content>
+                                <Step.Title>Review</Step.Title>
+                            </Step.Content>
+                        </Step>
+                    </Step.Group>
 
-                    {/* Radio Group for Product Type */}
-                    <div className="mb-3">
-                        <label className="text-pink-300 font-bold">Product Type:</label>
-                        <div className="flex gap-4">
-                            <label className="flex items-center">
-                                <input
-                                    type="radio"
+                    {step === 1 && (
+                        <Form>
+                            <Form.Input
+                                fluid
+                                label="Product Title"
+                                placeholder="Product Title"
+                                value={product.title}
+                                onChange={(e) =>
+                                    setProduct({ ...product, title: e.target.value })
+                                }
+                            />
+                            <Form.Input
+                                fluid
+                                label="Product Code"
+                                placeholder="Product Code"
+                                value={product.code}
+                                onChange={(e) =>
+                                    setProduct({ ...product, code: e.target.value })
+                                }
+                            />
+                            <Form.Input
+                                fluid
+                                label="Product Price"
+                                placeholder="Product Price"
+                                type="number"
+                                value={product.price}
+                                onChange={(e) =>
+                                    setProduct({ ...product, price: e.target.value })
+                                }
+                            />
+                            <Button onClick={nextStep} primary fluid>
+                                Next
+                            </Button>
+                        </Form>
+                    )}
+
+                    {step === 2 && (
+                        <Form>
+                            <Form.Group widths="equal">
+                                <Form.Select
+                                    fluid
+                                    label="Category"
+                                    options={categoryList.map((category) => ({
+                                        key: category.name,
+                                        text: category.name,
+                                        value: category.name,
+                                    }))}
+                                    placeholder="Select Category"
+                                    value={product.category}
+                                    onChange={(e, { value }) =>
+                                        setProduct({
+                                            ...product,
+                                            category: value,
+                                            category2: "",
+                                            subcategory: "",
+                                        })
+                                    }
+                                />
+                                <Form.Select
+                                    fluid
+                                    label="Subcategory"
+                                    options={
+                                        product.category
+                                            ? subCategoryList.map((sub) => ({
+                                                key: sub.name,
+                                                text: sub.name,
+                                                value: sub.name,
+                                            }))
+                                            : []
+                                    }
+                                    placeholder="Select Subcategory"
+                                    value={product.category2}
+                                    onChange={(e, { value }) =>
+                                        setProduct({
+                                            ...product,
+                                            category2: value,
+                                            subcategory: "",
+                                        })
+                                    }
+                                    disabled={!product.category}
+                                />
+                            </Form.Group>
+                            <Form.Input
+                                fluid
+                                label="Sub-subcategory"
+                                placeholder="Sub-subcategory"
+                                value={product.subcategory}
+                                onChange={(e) =>
+                                    setProduct({ ...product, subcategory: e.target.value })
+                                }
+                            />
+                            <Button.Group fluid>
+                                <Button onClick={prevStep} secondary>
+                                    Back
+                                </Button>
+                                <Button onClick={nextStep} primary>
+                                    Next
+                                </Button>
+                            </Button.Group>
+                        </Form>
+                    )}
+
+                    {step === 3 && (
+                        <Form>
+                            <Form.TextArea
+                                label="Product Description"
+                                placeholder="Product Description"
+                                value={product.description}
+                                onChange={(e) =>
+                                    setProduct({ ...product, description: e.target.value })
+                                }
+                            />
+                            <Form.Group inline>
+                                <label>Product Type:</label>
+                                <Form.Radio
+                                    label="New Product"
                                     value="New Product"
                                     checked={product.productType === "New Product"}
-                                    onChange={(e) =>
-                                        setProduct({ ...product, productType: e.target.value })
+                                    onChange={(e, { value }) =>
+                                        setProduct({ ...product, productType: value })
                                     }
-                                    className="mr-2"
                                 />
-                                New Product
-                            </label>
-                            <label className="flex items-center">
-                                <input
-                                    type="radio"
+                                <Form.Radio
+                                    label="Sales"
                                     value="Sales"
                                     checked={product.productType === "Sales"}
-                                    onChange={(e) =>
-                                        setProduct({ ...product, productType: e.target.value })
+                                    onChange={(e, { value }) =>
+                                        setProduct({ ...product, productType: value })
                                     }
-                                    className="mr-2"
                                 />
-                                Sales
-                            </label>
-                        </div>
-                    </div>
+                            </Form.Group>
+                            <Button.Group fluid>
+                                <Button onClick={prevStep} secondary>
+                                    Back
+                                </Button>
+                                <Button onClick={nextStep} primary>
+                                    Next
+                                </Button>
+                            </Button.Group>
+                        </Form>
+                    )}
 
-                    <div className="mb-3">
-                        <input
-                            type="text"
-                            name="title"
-                            value={product.title}
-                            onChange={(e) => setProduct({ ...product, title: e.target.value })}
-                            placeholder='Product Title'
-                            className='bg-pink-50 border text-pink-300 border-pink-200 px-2 py-2 w-96 rounded-md outline-none placeholder-pink-300'
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <input
-                            type="text"
-                            name="code"
-                            value={product.code}
-                            onChange={(e) => setProduct({ ...product, code: e.target.value })}
-                            placeholder='Product Code'
-                            className='bg-pink-50 border text-pink-300 border-pink-200 px-2 py-2 w-96 rounded-md outline-none placeholder-pink-300'
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <input
-                            type="number"
-                            name="price"
-                            value={product.price}
-                            onChange={(e) => setProduct({ ...product, price: e.target.value })}
-                            placeholder='Product Price'
-                            className='bg-pink-50 border text-pink-300 border-pink-200 px-2 py-2 w-96 rounded-md outline-none placeholder-pink-300'
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <select
-                            value={product.category}
-                            onChange={(e) => setProduct({ ...product, category: e.target.value })}
-                            className="w-full px-1 py-2 text-pink-300 bg-pink-50 border border-pink-200 rounded-md outline-none  ">
-                            <option disabled>Select Product Category</option>
-                            {categoryList.map((value, index) => (
-                                <option key={index} value={value.name}>{value.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="mb-3">
-                        <select
-                            value={product.category2}
-                            onChange={(e) => setProduct({ ...product, category2: e.target.value })}
-                            className="w-full px-1 py-2 text-pink-300 bg-pink-50 border border-pink-200 rounded-md outline-none  ">
-                            <option disabled>Select Product Sub Category</option>
-                            {SubCategoryList.map((value, index) => (
-                                <option key={index} value={value.name}>{value.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="mb-3">
-                        <input
-                            type="text"
-                            name="subcategory"
-                            value={product.subcategory}
-                            onChange={(e) => setProduct({ ...product, subcategory: e.target.value })}
-                            placeholder='Product Sub Category'
-                            className='bg-pink-50 border text-pink-300 border-pink-200 px-2 py-2 w-96 rounded-md outline-none placeholder-pink-300'
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <textarea
-                            value={product.description}
-                            onChange={(e) => setProduct({ ...product, description: e.target.value })}
-                            name="description"
-                            placeholder="Product Description"
-                            rows="5"
-                            className="w-full px-2 py-1 text-pink-300 bg-pink-50 border border-pink-200 rounded-md outline-none placeholder-pink-300"
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <button
-                            onClick={updateProduct}
-                            type='button'
-                            className='bg-pink-500 hover:bg-pink-600 w-full text-white text-center py-2 font-bold rounded-md'
-                        >
-                            Update Product
-                        </button>
-                    </div>
-                </div>
+                    {step === 4 && (
+                        <Segment>
+                            <Header as="h3">Review Your Product</Header>
+                            <p><strong>Title:</strong> {product.title}</p>
+                            <p><strong>Code:</strong> {product.code}</p>
+                            <p><strong>Price:</strong> {product.price}</p>
+                            <p><strong>Category:</strong> {product.category}</p>
+                            <p><strong>Subcategory:</strong> {product.category2}</p>
+                            <p><strong>Sub-subcategory:</strong> {product.subcategory}</p>
+                            <p><strong>Description:</strong> {product.description}</p>
+                            <Button.Group fluid>
+                                <Button onClick={prevStep} secondary>
+                                    Back
+                                </Button>
+                                <Button onClick={updateProduct} positive>
+                                    Submit
+                                </Button>
+                            </Button.Group>
+                        </Segment>
+                    )}
+                </Segment>
             )}
         </div>
     );
-}
+};
 
 export default UpdateProductPage;

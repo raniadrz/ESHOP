@@ -1,4 +1,6 @@
 import { Toaster } from "react-hot-toast";
+import 'semantic-ui-css/semantic.min.css';
+
 import {
   Route,
   BrowserRouter as Router,
@@ -13,10 +15,9 @@ import CartPage from "./pages/cart/CartPage";
 import CategoryPage from "./pages/category/CategoryPage";
 import HomePage from "./pages/home/HomePage";
 import NoPage from "./pages/noPage/NoPage";
-import ProductInfo from "./pages/productInfo/ProductInfo";
+import ProductInfo from "./pages/productInfo/ProductInfo"; // Make sure ProductInfo includes Comments
 import Login from "./pages/registration/Login";
 import Signup from "./pages/registration/Signup";
-import UserDashboard from "./pages/user/UserDashboard";
 import { ProtectedRouteForAdmin } from "./protectedRoute/ProtectedRouteForAdmin";
 import { ProtectedRouteForUser } from "./protectedRoute/ProtectedRouteForUser";
 
@@ -26,7 +27,7 @@ import PPolicy from "./pages/footer/privacyPolicy/privacyPolicy";
 import ReturnPolicy from './pages/footer/returnPolicy/ReturnPolicy';
 import UserSettings from './components/user/ProfileDetail';
 
-function  App () {
+function App() {
   return (
     <MyState>
       <Router>
@@ -34,18 +35,18 @@ function  App () {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/*" element={<NoPage />} />
-          <Route path="/privacypolicy" element={<PPolicy/>} />
-          <Route path="/returnpolicy" element={<ReturnPolicy/>} />
+          <Route path="/privacypolicy" element={<PPolicy />} />
+          <Route path="/returnpolicy" element={<ReturnPolicy />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           <Route path="/productinfo/:id" element={<ProductInfo />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/category/:categoryname" element={<CategoryPage />} />  {/* category Page route  */}
+          <Route path="/category/:categoryname" element={<CategoryPage />} />
           <Route path="/user-dashboard" element={
             <ProtectedRouteForUser>
-              <UserDashboard />
+              <UserSettings />
             </ProtectedRouteForUser>
           } />
           <Route path="/admin-dashboard" element={
@@ -72,6 +73,7 @@ function  App () {
         <Toaster />
       </Router>
     </MyState>
-  )
+  );
 }
-export default App
+
+export default App;

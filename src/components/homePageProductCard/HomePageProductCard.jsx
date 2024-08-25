@@ -1,12 +1,12 @@
 import React, { useContext, useEffect } from "react";
-import toast from "react-hot-toast";
+import { Button, Card, CardContent, CardMedia, Grid, Typography, Container, Chip, CircularProgress, Box } from "@mui/material";
+import StarIcon from '@mui/icons-material/Star';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
 import myContext from "../../context/myContext";
 import { addToCart } from "../../redux/cartSlice";
-import Loader from "../loader/Loader";
-import NewReleasesIcon from '@mui/icons-material/NewReleases';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 
 const HomePageProductCard = () => {
     const navigate = useNavigate();
@@ -15,11 +15,10 @@ const HomePageProductCard = () => {
     const { loading, getAllProduct } = context;
 
     const cartItems = useSelector((state) => state.cart);
-
     const dispatch = useDispatch();
 
     const addCart = (item) => {
-        const itemWithTime = { ...item, time: new Date().toISOString() }; // Add current time as ISO string
+        const itemWithTime = { ...item, time: new Date().toISOString() };
         dispatch(addToCart(itemWithTime));
         toast.success("Added to cart");
     };
@@ -29,67 +28,81 @@ const HomePageProductCard = () => {
     }, [cartItems]);
 
     return (
-        <div className="mt-10">
-            <div className="">
-                <h1 className=" text-center mb-5 text-2xl font-semibold">Bestselling Products</h1>
-            </div>
-            <section className="text-gray-600 body-font">
-                <div className="container px-5 py-5 mx-auto">
-                    <div className="flex justify-center">
-                        {loading && <Loader />}
-                    </div>
-                    <div className="flex flex-wrap -m-4">
-                        {getAllProduct.slice(0, 12).map((item, index) => {
-                            const { id, title, price, productImageUrl, productType } = item;
-                            return (
-                                <div key={index} className="p-4 w-1/2 md:w-1/6">
-                                    <div className="relative h-2/2 border border-blue-100 rounded-xl overflow-hidden shadow-md cursor-pointer">
-                                        
-                                        {/* Conditionally render product type icons */}
-                                        {productType === "New Product" && (
-                                            <div className="absolute top-2 left-2">
-                                                <NewReleasesIcon style={{ color: 'green' }} />
-                                            </div>
-                                        )}
-                                        {productType === "Sales" && (
-                                            <div className="absolute top-2 right-2">
-                                                <LocalOfferIcon style={{ color: 'red' }} />
-                                            </div>
-                                        )}
-
-                                        <img
-                                            onClick={() => navigate(`/productinfo/${id}`)}
-                                            className="w-48 h-48 object-cover mx-auto"
-                                            src={productImageUrl}
-                                            alt="product"
+        <Container maxWidth="lg" sx={{ textAlign: 'center', mt: 4 }}>
+            <Typography variant="h4" gutterBottom>
+                Bestselling Products
+            </Typography>
+            {loading && <CircularProgress />}
+            <Grid container spacing={4} justifyContent="center">
+                {getAllProduct.slice(0, 12).map((item, index) => {
+                    const { id, title, price, productImageUrl, productType } = item;
+                    return (
+                        <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+                            <Card 
+                                sx={{ 
+                                    height: '100%', 
+                                    display: 'flex', 
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between'
+                                }} 
+                                onClick={() => navigate(`/productinfo/${id}`)}
+                            >
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200 }}>
+                                    <CardMedia
+                                        component="img"
+                                        image={productImageUrl}
+                                        alt="product"
+                                        sx={{ 
+                                            width: 'auto',
+                                            maxHeight: '100%',
+                                            maxWidth: '100%',
+                                            objectFit: 'contain',
+                                        }}
+                                    />
+                                </Box>
+                                <CardContent sx={{ flexGrow: 1 }}>
+                                    <Typography variant="h6" component="div">
+                                        {title}
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                        E-ctb
+                                    </Typography>
+                                    <Typography variant="h6" color="textPrimary">
+                                        {price}€
+                                    </Typography>
+                                    {productType === "New Product" && (
+                                        <Chip
+                                            label="New"
+                                            color="success"
+                                            icon={<StarIcon />}
+                                            sx={{ mt: 1 }}
                                         />
-                                        <div className="p-6">
-                                            <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">
-                                                E-ctb
-                                            </h2>
-                                            <h1 className="title-font text-sm font-small text-gray-900 mb-3">
-                                                {title}
-                                            </h1>
-                                            <h1 className="title-font text-lg font-medium text-gray-900 mb-3">
-                                                {price}€
-                                            </h1>
-                                            <div>
-                                                <button
-                                                    onClick={() => addCart(item)}
-                                                    className="bg-blue-500 hover:bg-blue-600 w-full text-white py-[4px] rounded-lg font-bold">
-                                                    Add To Cart
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-        </div>
+                                    )}
+                                    {productType === "Sales" && (
+                                        <Chip
+                                            label="Sale"
+                                            color="error"
+                                            icon={<LocalOfferIcon />}
+                                            sx={{ mt: 1 }}
+                                        />
+                                    )}
+                                </CardContent>
+                                <Box sx={{ p: 2 }}>
+                                    <Button
+                                        onClick={(e) => { e.stopPropagation(); addCart(item); }}
+                                        variant="contained"
+                                        fullWidth
+                                    >
+                                        Add To Cart
+                                    </Button>
+                                </Box>
+                            </Card>
+                        </Grid>
+                    );
+                })}
+            </Grid>
+        </Container>
     );
-}
+};
 
 export default HomePageProductCard;

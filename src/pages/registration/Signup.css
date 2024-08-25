@@ -1,43 +1,121 @@
 /* Signup.css */
 
-body, html {
-    height: 100%;
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-.bg-image {
-    /* Use a full-page background image */
-    background-image: url('./petLogin.webp'); /* Replace with your desired image path */
-    background-size: cover;
-    background-position: center;
+.signup-bg {
+    background-image: url('./petLogin.webp'); /* Add the path to your background image here */
+    background-size: cover; /* Ensures the background image covers the entire background */
+    background-position: center; /* Centers the background image */
+    background-repeat: no-repeat; /* Prevents the background image from repeating */
+    min-height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
-    height: 100vh;
+    justify-content: center;
+    padding: 20px;
 }
 
-.login-form {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(5px);
-    border: 2px solid #7ac8f6; /* Forest Green */
+.signup-segment {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background for form */
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    padding: 2rem;
-    max-width: 500px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 600px;
     width: 100%;
-    margin: 0 20px;
+}
+
+.signup-header {
+    color: #1e70bf; /* Blue header color */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.signup-step-group {
+    margin-bottom: 15px;
+    padding: 0;
+    font-size: 0.8em;
+}
+
+.signup-step {
+    padding: 5px;
+    color: #1e70bf; /* Blue step color */
+}
+
+.signup-step .title {
+    font-size: 0.9em;
+}
+
+.signup-step .description {
+    font-size: 0.75em;
+}
+
+.signup-form-input {
+    margin-bottom: 15px;
+}
+
+.signup-form-input input,
+.signup-form-input select {
+    border: 1px solid #d3e2f9; /* Light blue border */
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1em;
+}
+
+.signup-button-group {
+    margin-top: 15px;
+}
+
+.signup-button-group .ui.button.primary {
+    background-color: #1e70bf; /* Blue button color */
+    color: white;
+}
+
+.signup-button-group .ui.button.primary:hover {
+    background-color: #155a8a; /* Darker blue on hover */
+}
+
+.signup-button-group .ui.button.secondary {
+    background-color: #f0f8ff; /* Light blue background */
+    color: #1e70bf; /* Blue text color */
+}
+
+.signup-button-group .ui.button.secondary:hover {
+    background-color: #e0f0ff; /* Slightly darker blue on hover */
+}
+
+.signup-divider {
+    margin-top: 25px;
+}
+
+.signup-footer {
     text-align: center;
 }
 
-.input-field {
-    background-color: rgba(255, 255, 255, 0.8);
-    border: 1px solid #ccc;
-    padding: 0.5rem;
-    border-radius: 5px;
-    width: 100%;
-    margin-bottom: 1rem;
-    outline: none;
-    transition: border-color 0.3s ease;
+.signup-footer p {
+    margin-top: 20px;
+    color: #1e70bf; /* Blue text color */
 }
 
+.signup-footer a {
+    color: #1e70bf; /* Blue link color */
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.signup-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Review segment */
+.review-segment {
+    background-color: #f9f9f9; /* Light gray background */
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.review-segment h3 {
+    color: #1e70bf; /* Blue color for review header */
+    text-align: center;
+}
+
+.review-segment p {
+    margin: 10px 0;
+}

@@ -1,23 +1,7 @@
 // MyState.jsx
 import React, { useEffect, useState } from "react";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  onSnapshot,
-  orderBy,
-  query,
-  updateDoc,
-  setDoc,
-  addDoc,
-  getDoc,
-} from "firebase/firestore";
-import {
-  getAuth,
-  updateProfile,
-  deleteUser as fbDeleteUser,
-} from "firebase/auth";
+import {collection,deleteDoc,doc,getDocs,onSnapshot,orderBy,query,updateDoc,setDoc,addDoc,getDoc,Timestamp} from "firebase/firestore";
+import {getAuth,updateProfile,deleteUser as fbDeleteUser,} from "firebase/auth";
 import toast from "react-hot-toast";
 import { fireDB } from "../firebase/FirebaseConfig";
 import MyContext from "./myContext";
@@ -27,18 +11,57 @@ function MyState({ children }) {
   const [getAllProduct, setGetAllProduct] = useState([]);
   const [getAllOrder, setGetAllOrder] = useState([]);
   const [getAllUser, setGetAllUser] = useState([]);
-  const [coupons, setCoupons] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
 
-  // Fetch Coupons
-  const fetchCoupons = async () => {
-    const querySnapshot = await getDocs(collection(fireDB, "coupons"));
-    const couponsArray = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    setCoupons(couponsArray);
+
+  // Add Testimonial
+  const addTestimonial = async (name, comment) => {
+    setLoading(true);
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    try {
+      if (user) {
+        await addDoc(collection(fireDB, "testimonials"), {
+          name: name || user.displayName,
+          comment,
+          photoURL: user.photoURL || "", // use user's photo if available
+          time: Timestamp.now(), // Use Timestamp for the current time
+        });
+        toast.success("Testimonial added successfully");
+        fetchTestimonials();
+      } else {
+        throw new Error("User must be logged in to submit a testimonial");
+      }
+    } catch (error) {
+      console.error("Error adding testimonial: ", error);
+      toast.error("Failed to add testimonial");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Fetch testimonials
+  const fetchTestimonials = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(fireDB, "testimonials"), orderBy("time", "desc"));
+      const data = onSnapshot(q, (QuerySnapshot) => {
+        let testimonialArray = [];
+        QuerySnapshot.forEach((doc) => {
+          testimonialArray.push({ ...doc.data(), id: doc.id });
+        });
+        setTestimonials(testimonialArray.slice(0, 3)); // Get the latest three testimonials
+        setLoading(false);
+      });
+      return () => data;
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
+
+  
   // Create or Update User Details
   const updateUserDetails = async (uid, newName, newEmail, photoURL) => {
     setLoading(true);
@@ -251,7 +274,7 @@ function MyState({ children }) {
     getAllProductFunction();
     getAllOrderFunction();
     getAllUserFunction();
-    fetchCoupons();
+    fetchTestimonials();
   }, []);
 
   return (
@@ -269,6 +292,8 @@ function MyState({ children }) {
         updateOrderStatus,
         deleteUser,
         createUser, // Add createUser to the context provider
+        testimonials,
+        addTestimonial, 
       }}
     >
       {children}
