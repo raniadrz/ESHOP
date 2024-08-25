@@ -1,8 +1,9 @@
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router";
+import { useParams } from "react-router-dom";
+import { Icon } from "semantic-ui-react"; // Import Semantic UI components
 import Layout from "../../components/layout/Layout";
 import Loader from "../../components/loader/Loader";
 import myContext from "../../context/myContext";
@@ -10,116 +11,158 @@ import { fireDB } from "../../firebase/FirebaseConfig";
 import { addToCart, deleteFromCart } from "../../redux/cartSlice";
 import NewReleasesIcon from '@mui/icons-material/NewReleases';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import Comments from "../../components/user/Comments";
+import './productInfo.css';
 
 const ProductInfo = () => {
-    const context = useContext(myContext);
-    const { loading, setLoading } = context;
-
-    const [product, setProduct] = useState('');
-
+    const { loading, setLoading } = useContext(myContext);
+    const [product, setProduct] = useState(null);
+    const [userRating, setUserRating] = useState(0); // User's rating for this product
+    const [averageRating, setAverageRating] = useState(0); // Average rating
     const { id } = useParams();
-
-    const getProductData = async () => {
-        setLoading(true);
-        try {
-            const productTemp = await getDoc(doc(fireDB, "products", id));
-            setProduct({ ...productTemp.data(), id: productTemp.id });
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-            setLoading(false);
-        }
-    };
-
     const cartItems = useSelector((state) => state.cart);
     const dispatch = useDispatch();
 
-    const addCart = (item) => {
-        dispatch(addToCart(item));
-        toast.success("Added to cart");
-    };
+    const userId = "user-unique-id"; // Replace with the actual user's ID (from auth context or state)
 
-    const deleteCart = (item) => {
-        dispatch(deleteFromCart(item));
-        toast.success("Deleted from cart");
-    };
+    useEffect(() => {
+        const fetchProductData = async () => {
+            setLoading(true);
+            try {
+                const productDoc = await getDoc(doc(fireDB, "products", id));
+                if (productDoc.exists()) {
+                    const productData = productDoc.data();
+                    setProduct({ ...productData, id: productDoc.id });
+
+                    // Calculate average rating
+                    const ratings = productData.ratings || {};
+                    const userRating = ratings[userId] || 0;
+                    setUserRating(userRating);
+
+                    const totalRating = Object.values(ratings).reduce((acc, curr) => acc + curr, 0);
+                    const average = totalRating / Object.keys(ratings).length;
+                    setAverageRating(average || 0);
+                } else {
+                    toast.error("Product not found");
+                }
+            } catch (error) {
+                console.error("Error fetching product:", error);
+                toast.error("Failed to load product");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProductData();
+    }, [id, setLoading, userId]);
 
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cartItems));
     }, [cartItems]);
 
-    useEffect(() => {
-        getProductData();
-    }, []);
+    const handleAddToCart = (item) => {
+        dispatch(addToCart(item));
+        toast.success("Added to cart");
+    };
+
+    const handleDeleteFromCart = (item) => {
+        dispatch(deleteFromCart(item));
+        toast.success("Deleted from cart");
+    };
+
+    const handleRating = async (rating) => {
+        if (!product) return;
+
+        const newRatings = {
+            ...product.ratings,
+            [userId]: rating,
+        };
+
+        const newTotalRating = Object.values(newRatings).reduce((acc, curr) => acc + curr, 0);
+        const newAverageRating = newTotalRating / Object.keys(newRatings).length;
+
+        try {
+            await updateDoc(doc(fireDB, "products", id), {
+                ratings: newRatings,
+            });
+
+            setUserRating(rating);
+            setAverageRating(newAverageRating);
+            toast.success("Rating updated");
+        } catch (error) {
+            console.error("Error updating rating:", error);
+            toast.error("Failed to update rating");
+        }
+    };
 
     return (
         <Layout>
-            <section className="py-5 lg:py-16 font-poppins dark:bg-gray-800">
+            <section className="product-info-section">
                 {loading ? (
-                    <div className="flex justify-center items-center">
+                    <div className="loading-container">
                         <Loader />
                     </div>
                 ) : (
-                    <div className="max-w-6xl px-4 mx-auto">
-                        <div className="flex flex-wrap mb-24 -mx-4">
-                            <div className="relative w-full px-4 mb-8 md:w-1/2 md:mb-0">
-                                <div className="relative">
+                    product && (
+                        <div className="product-info-container">
+                            <div className="product-info-flex">
+                                <div className="product-image-container">
                                     <img
-                                        className="w-full lg:h-[39em] rounded-lg"
+                                        className="product-image"
                                         src={product?.productImageUrl}
                                         alt={product?.title}
                                     />
-                                    
-                                    {/* Conditionally render the badge */}
                                     {product?.productType === "New Product" && (
-                                        <div className="absolute top-3.5 left-4 bg-green-500 text-white p-2 rounded-lg shadow-lg text-lg font-bold flex items-center">
-                                            <NewReleasesIcon className="mr-2" />
+                                        <div className="badge new-product">
+                                            <NewReleasesIcon className="badge-icon" />
                                             New Product!
                                         </div>
                                     )}
                                     {product?.productType === "Sales" && (
-                                        <div className="absolute top-3.5 left-4 bg-red-500 text-white p-2 rounded-lg shadow-lg text-lg font-bold flex items-center">
-                                            <LocalOfferIcon className="mr-2" />
+                                        <div className="badge sales">
+                                            <LocalOfferIcon className="badge-icon" />
                                             Sales!
                                         </div>
                                     )}
                                 </div>
-                            </div>
-                            <div className="w-full px-4 md:w-1/2">
-                                <div className="lg:pl-20">
-                                    <div className="mb-6">
-                                        <h2 className="max-w-xl mb-6 text-xl font-semibold leading-loose tracking-wide text-gray-700 md:text-2xl dark:text-gray-300">
-                                            {product?.title}
-                                        </h2>
-                                        <div className="mb-6">
-                                            <h2 className="mb-2 text-lg text-gray-700 dark:text-gray-400">
-                                                Code: {product?.code}
-                                            </h2>
+                                <div className="product-details">
+                                    <h2 className="product-title">{product?.title}</h2>
+                                    <p className="product-code">Code: {product?.code}</p>
+                                    <p className="product-description">{product?.description}</p>
+                                    <p className="product-category">
+                                        Race: {product?.category} | Category: {product?.subcategory}
+                                    </p>
+                                    <p className="product-price">Price: {product?.price}€</p>
+
+                                    {/* Rating Section */}
+                                    <div className="product-rating">
+                                        <p>Rating: {averageRating.toFixed(1)} / 5</p>
+                                        <div className="rating-hearts">
+                                            {[1, 2, 3, 4, 5].map((value) => (
+                                                <Icon
+                                                    key={value}
+                                                    name="heart"
+                                                    size="large"
+                                                    color={userRating >= value ? "red" : "grey"}
+                                                    onClick={() => handleRating(value)}
+                                                    style={{ cursor: "pointer" }}
+                                                />
+                                            ))}
                                         </div>
                                     </div>
-                                    <div className="mb-6">
-                                        <p>{product?.description}</p>
-                                    </div>
-                                    <div className="mb-6">
-                                        <h6 className="mb-2 text-gray-700 dark:text-gray-400">
-                                            Race: {product?.category} | Category: {product?.subcategory}
-                                        </h6>
-                                    </div>
-                                    <p className="inline-block text-2xl font-semibold text-gray-700 dark:text-gray-400">
-                                        Price: {product?.price}€
-                                    </p>
-                                    <div className="flex flex-wrap items-center mb-6">
+
+                                    <div className="cart-actions">
                                         {cartItems.some((p) => p.id === product.id) ? (
                                             <button
-                                                onClick={() => deleteCart(product)}
-                                                className="w-full px-4 py-3 text-center text-white bg-blue-500 border border-blue-600 hover:bg-blue-600 hover:text-gray-100 rounded-xl"
+                                                onClick={() => handleDeleteFromCart(product)}
+                                                className="cart-button delete"
                                             >
                                                 Delete from cart
                                             </button>
                                         ) : (
                                             <button
-                                                onClick={() => addCart(product)}
-                                                className="w-full px-4 py-3 text-center text-blue-600 bg-blue-100 border border-blue-600 hover:bg-blue-600 hover:text-gray-100 rounded-xl"
+                                                onClick={() => handleAddToCart(product)}
+                                                className="cart-button add"
                                             >
                                                 Add to cart
                                             </button>
@@ -128,8 +171,9 @@ const ProductInfo = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )
                 )}
+                {product && <Comments productId={product.id} />}
             </section>
         </Layout>
     );
