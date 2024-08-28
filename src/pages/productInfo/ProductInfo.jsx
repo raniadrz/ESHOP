@@ -11,7 +11,7 @@ import { fireDB } from "../../firebase/FirebaseConfig";
 import { addToCart, deleteFromCart } from "../../redux/cartSlice";
 import NewReleasesIcon from '@mui/icons-material/NewReleases';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import Comments from "../../components/user/Comments";
+import Comments from "../../components/comments/Comments";
 import './productInfo.css';
 
 const ProductInfo = () => {
