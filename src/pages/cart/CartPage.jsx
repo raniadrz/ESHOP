@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router";
 import BuyNowModal from "../../components/buyNowModal/BuyNowModal";
 import Layout from "../../components/layout/Layout";
+import { fireDB } from '../../firebase/FirebaseConfig'; 
 import {
     decrementQuantity,
     deleteFromCart,
@@ -99,17 +100,15 @@ const CartPage = () => {
     });
 
     const buyNowFunction = async () => {
-        // validation 
         if (addressInfo.name === "" || addressInfo.address === "" || addressInfo.pincode === "" || addressInfo.mobileNumber === "") {
             return toast.error("All Fields are required");
         }
-
+    
         const user = getAuth().currentUser;
         if (!user) {
             return toast.error("User not authenticated");
         }
-
-        // Order Info 
+    
         const orderInfo = {
             cartItems,
             addressInfo,
@@ -126,6 +125,7 @@ const CartPage = () => {
                 }
             )
         };
+    
         try {
             const orderRef = collection(fireDB, 'order');
             await addDoc(orderRef, orderInfo);
@@ -142,6 +142,7 @@ const CartPage = () => {
             toast.error("Failed to place order. Please try again.");
         }
     };
+    
 
     return (
         <Layout>
