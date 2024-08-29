@@ -17,6 +17,7 @@ import {
     saveCartToFirestore
 } from "../../redux/cartSlice";
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import emailjs from 'emailjs-com';
 
 const CartPage = () => {
     const cartItems = useSelector((state) => state.cart);
@@ -99,6 +100,26 @@ const CartPage = () => {
         )
     });
 
+    
+    // Example of using EmailJS in your frontend React component
+    const sendOrderConfirmationEmail = (order) => {
+        const templateParams = {
+            to_email: order.email,
+            order_id: order.userid, // or order.id if you have it
+            order_details: JSON.stringify(order.cartItems, null, 2),
+            message: `Thank you for your purchase. Please make the deposit to the following IBANs: Eurobank IBAN GR12 3456 7891 2345, Piraeus IBAN GR23 4567 8901 2345, Alpha IBAN GR12 3456 7890 1234 in the next 48 hours to process your order.`
+        };
+
+        emailjs.send('service_4pq7vdd', 'template_1unb31r', templateParams, 'MLiyOAD--CSZFqkQm')
+            .then((response) => {
+                console.log('Email sent successfully:', response);
+            })
+            .catch((error) => {
+                console.error('Error sending email:', error);
+            });
+    };
+
+
     const buyNowFunction = async () => {
         if (addressInfo.name === "" || addressInfo.address === "" || addressInfo.pincode === "" || addressInfo.mobileNumber === "") {
             return toast.error("All Fields are required");
@@ -127,8 +148,13 @@ const CartPage = () => {
         };
     
         try {
+            // Save the order to Firestore
             const orderRef = collection(fireDB, 'order');
             await addDoc(orderRef, orderInfo);
+    
+            // Send the order confirmation email
+            sendOrderConfirmationEmail(orderInfo);
+    
             setAddressInfo({
                 name: "",
                 address: "",
@@ -142,6 +168,8 @@ const CartPage = () => {
             toast.error("Failed to place order. Please try again.");
         }
     };
+    
+
     
 
     return (
