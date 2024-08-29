@@ -1,7 +1,24 @@
-// MyState.jsx
 import React, { useEffect, useState } from "react";
-import {collection,deleteDoc,doc,getDocs,onSnapshot,orderBy,query,updateDoc,setDoc,addDoc,getDoc,Timestamp} from "firebase/firestore";
-import {getAuth,updateProfile,deleteUser as fbDeleteUser,} from "firebase/auth";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  updateDoc,
+  setDoc,
+  addDoc,
+  getDoc,
+  Timestamp,
+} from "firebase/firestore";
+import {
+  getAuth,
+  updateProfile,
+  deleteUser as fbDeleteUser,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 import toast from "react-hot-toast";
 import { fireDB } from "../firebase/FirebaseConfig";
 import MyContext from "./myContext";
@@ -12,7 +29,6 @@ function MyState({ children }) {
   const [getAllOrder, setGetAllOrder] = useState([]);
   const [getAllUser, setGetAllUser] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
-
 
   // Add Testimonial
   const addTestimonial = async (name, comment) => {
@@ -61,7 +77,6 @@ function MyState({ children }) {
     }
   };
 
-  
   // Create or Update User Details
   const updateUserDetails = async (uid, newName, newEmail, photoURL) => {
     setLoading(true);
@@ -75,7 +90,7 @@ function MyState({ children }) {
           await updateProfile(user, { displayName: newName, photoURL: photoURL });
         }
 
-        const userDocRef = doc(fireDB, "updated_Users", uid);
+        const userDocRef = doc(fireDB, "user", uid);
         const docSnapshot = await getDoc(userDocRef);
 
         if (docSnapshot.exists()) {
@@ -86,19 +101,18 @@ function MyState({ children }) {
           });
 
           toast.success("User details updated successfully");
-          getAllUserFunction();
         } else {
           await setDoc(userDocRef, {
             name: newName,
             email: newEmail,
             photoURL: photoURL,
             role: user.role || "User",
-            time: user.metadata.creationTime,
+            time: Timestamp.now(),
           });
 
           toast.success("User profile created successfully");
-          getAllUserFunction();
         }
+        getAllUserFunction();
       } else {
         throw new Error("No user is currently logged in");
       }
@@ -247,18 +261,19 @@ function MyState({ children }) {
   };
 
   // Create User
-  const createUser = async (name, email, password, role) => {
+  const createUser = async (name, email, password, role = "user") => {
     setLoading(true);
     const auth = getAuth();
     try {
-      const { user } = await auth.createUserWithEmailAndPassword(email, password);
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(user, { displayName: name });
       const userDocRef = doc(fireDB, "user", user.uid);
       await setDoc(userDocRef, {
         name,
         email,
         role,
-        time: Timestamp.now().toDate(),
+        photoURL: user.photoURL || "",
+        time: Timestamp.now(),
       });
       toast.success(`User ${name} created successfully`);
       getAllUserFunction();
@@ -293,7 +308,7 @@ function MyState({ children }) {
         deleteUser,
         createUser, // Add createUser to the context provider
         testimonials,
-        addTestimonial, 
+        addTestimonial,
       }}
     >
       {children}
