@@ -49,6 +49,9 @@ const UserDetail = () => {
         { field: 'email', headerName: 'Email', flex: 1, headerAlign: 'center', align: 'center' },
         { field: 'date', headerName: 'Date', flex: 1, headerAlign: 'center', align: 'center' },
         { field: 'role', headerName: 'Role', flex: 1, headerAlign: 'center', align: 'center' },
+        { field: 'dateOfBirth', headerName: 'Date of Birth', flex: 1, headerAlign: 'center', align: 'center' },
+        { field: 'country', headerName: 'Country', flex: 1, headerAlign: 'center', align: 'center' },
+        { field: 'profession', headerName: 'Profession', flex: 1, headerAlign: 'center', align: 'center' },
         {
             field: 'actions',
             headerName: 'Actions',
@@ -80,6 +83,9 @@ const UserDetail = () => {
         email: user.email,
         date: user.date,
         role: user.role,
+        dateOfBirth: user.dateOfBirth,
+        country: user.country,
+        profession: user.profession,
         uid: user.id
     }));
 
