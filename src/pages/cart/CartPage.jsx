@@ -104,12 +104,17 @@ const CartPage = () => {
     // Example of using EmailJS in your frontend React component
     const sendOrderConfirmationEmail = (order) => {
         const templateParams = {
-            to_email: order.email,
-            order_id: order.userid, // or order.id if you have it
-            order_details: JSON.stringify(order.cartItems, null, 2),
-            message: `Thank you for your purchase. Please make the deposit to the following IBANs: Eurobank IBAN GR12 3456 7891 2345, Piraeus IBAN GR23 4567 8901 2345, Alpha IBAN GR12 3456 7890 1234 in the next 48 hours to process your order.`
+            to_email: order.email, // Use the logged-in user's email address
+            order_id: order.id,
+            order_details: JSON.stringify(order.cartItems, null, 2), // Use the cart items or any other order details
+            message: `Thank you for your purchase. Please make the deposit to the following IBANs:
+            - Eurobank IBAN: GR12 3456 7891 2345
+            - Piraeus IBAN: GR23 4567 8901 2345
+            - Alpha IBAN: GR12 3456 7890 1234
+            
+            Please make the deposit within the next 48 hours so we can process your order.`
         };
-
+    
         emailjs.send('service_4pq7vdd', 'template_1unb31r', templateParams, 'MLiyOAD--CSZFqkQm')
             .then((response) => {
                 console.log('Email sent successfully:', response);
@@ -133,7 +138,7 @@ const CartPage = () => {
         const orderInfo = {
             cartItems,
             addressInfo,
-            email: user.email,
+            email: user.email, // Logged-in user's email
             userid: user.uid,
             status: "confirmed",
             time: Timestamp.now(),
@@ -148,11 +153,10 @@ const CartPage = () => {
         };
     
         try {
-            // Save the order to Firestore
             const orderRef = collection(fireDB, 'order');
             await addDoc(orderRef, orderInfo);
-    
-            // Send the order confirmation email
+            
+            // Send the order confirmation email to the logged-in user's email
             sendOrderConfirmationEmail(orderInfo);
     
             setAddressInfo({
@@ -168,6 +172,7 @@ const CartPage = () => {
             toast.error("Failed to place order. Please try again.");
         }
     };
+    
     
 
     
