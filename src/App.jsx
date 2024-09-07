@@ -15,7 +15,7 @@ import CartPage from "./pages/cart/CartPage";
 import CategoryPage from "./pages/category/CategoryPage";
 import HomePage from "./pages/home/HomePage";
 import NoPage from "./pages/noPage/NoPage";
-import ProductInfo from "./pages/productInfo/ProductInfo"; // Make sure ProductInfo includes Comments
+import ProductInfo from "./pages/productInfo/ProductInfo";
 import Login from "./pages/registration/Login";
 import Signup from "./pages/registration/Signup";
 import { ProtectedRouteForAdmin } from "./protectedRoute/ProtectedRouteForAdmin";
@@ -40,10 +40,12 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           <Route path="/productinfo/:id" element={<ProductInfo />} />
-          <Route path="/cart" element={<CartPage />} />
+          <Route path="/cart" element={<CartPage />} /> {/* CartPage accessible to everyone */}
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/category/:categoryname" element={<CategoryPage />} />
+
+          
           <Route path="/user-dashboard" element={
             <ProtectedRouteForUser>
               <UserSettings />

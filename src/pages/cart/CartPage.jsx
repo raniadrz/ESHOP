@@ -46,14 +46,14 @@ const CartPage = () => {
         }
         return total + price * item.quantity;
     }, 0).toFixed(2);
-
+    
     const shippingCost = cartTotal >= 50 ? 0 : 4;
-    const totalAmount = (parseFloat(cartTotal) + shippingCost).toFixed(2);
-
-    console.log('Cart Items:', cartItems);
+    const totalAmount = (Math.round((parseFloat(cartTotal) + shippingCost) * 100) / 100).toFixed(2);
+    
     console.log(`Cart Total: ${cartTotal}€`);
     console.log(`Shipping Cost: ${shippingCost}€`);
     console.log(`Total Amount: ${totalAmount}€`);
+    
 
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cartItems));
@@ -125,6 +125,8 @@ const CartPage = () => {
     };
 
 
+
+
     const buyNowFunction = async () => {
         if (addressInfo.name === "" || addressInfo.address === "" || addressInfo.pincode === "" || addressInfo.mobileNumber === "") {
             return toast.error("All Fields are required");
@@ -135,8 +137,13 @@ const CartPage = () => {
             return toast.error("User not authenticated");
         }
     
+        const formattedCartItems = cartItems.map(item => ({
+            ...item,
+            price: (Math.round(parseFloat(item.price) * 100) / 100).toFixed(2) // Ensure price is formatted
+        }));
+    
         const orderInfo = {
-            cartItems,
+            cartItems: formattedCartItems,
             addressInfo,
             email: user.email, // Logged-in user's email
             userid: user.uid,
@@ -155,7 +162,7 @@ const CartPage = () => {
         try {
             const orderRef = collection(fireDB, 'order');
             await addDoc(orderRef, orderInfo);
-            
+    
             // Send the order confirmation email to the logged-in user's email
             sendOrderConfirmationEmail(orderInfo);
     
@@ -172,6 +179,7 @@ const CartPage = () => {
             toast.error("Failed to place order. Please try again.");
         }
     };
+    
     
     
 

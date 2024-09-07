@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import Layout from "../../components/layout/Layout";
 import myContext from "../../context/myContext";
 import Loader from "../../components/loader/Loader";
@@ -41,6 +41,10 @@ const CollageAvatar = styled(Avatar)(({ theme }) => ({
     border: `2px solid ${theme.palette.secondary.main}`,
   },
 }));
+
+const formatPrice = (price) => {
+  return (Math.round(parseFloat(price) * 100) / 100).toFixed(2);
+};
 
 const ProfileDetail = () => {
     const user = JSON.parse(localStorage.getItem('users'));
@@ -130,7 +134,7 @@ const ProfileDetail = () => {
                                         <div className="mb-2">
                                             <div className="text-sm font-semibold">Total Amount</div>
                                             <div className="text-sm font-medium text-gray-900">
-                                                {order.items.reduce((total, item) => total + item.price * item.quantity, 0)}€
+                                                {formatPrice(order.items.reduce((total, item) => total + item.price * item.quantity, 0))}€
                                             </div>
                                         </div>
 
@@ -168,7 +172,7 @@ const ProfileDetail = () => {
                                                         </div>
 
                                                         <div className="ml-auto flex flex-col items-end justify-between">
-                                                            <p className="text-right text-sm font-bold text-gray-900"> {item.price}€</p>
+                                                            <p className="text-right text-sm font-bold text-gray-900"> {formatPrice(item.price)}€</p>
                                                         </div>
                                                     </li>
                                                 ))}

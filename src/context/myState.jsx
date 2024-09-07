@@ -29,35 +29,37 @@ function MyState({ children }) {
   const [getAllOrder, setGetAllOrder] = useState([]);
   const [getAllUser, setGetAllUser] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
+  
+// Add Testimonial
+const addTestimonial = async (name, comment) => {
+  setLoading(true);
+  const auth = getAuth();
+  const user = auth.currentUser;
 
-  // Add Testimonial
-  const addTestimonial = async (name, comment) => {
-    setLoading(true);
-    const auth = getAuth();
-    const user = auth.currentUser;
-
-    try {
-      if (user) {
-        await addDoc(collection(fireDB, "testimonials"), {
-          name: name || user.displayName,
-          comment,
-          photoURL: user.photoURL || "", // use user's photo if available
-          time: Timestamp.now(), // Use Timestamp for the current time
-        });
-        toast.success("Testimonial added successfully");
-        fetchTestimonials();
-      } else {
-        throw new Error("User must be logged in to submit a testimonial");
-      }
-    } catch (error) {
-      console.error("Error adding testimonial: ", error);
-      toast.error("Failed to add testimonial");
-    } finally {
-      setLoading(false);
+  try {
+    if (user) {
+      await addDoc(collection(fireDB, "testimonials"), {
+        name: name || user.displayName,
+        comment,
+        photoURL: user.photoURL || "", // use user's photo if available
+        time: Timestamp.now(), // Use Timestamp for the current time
+      });
+      toast.success("Testimonial added successfully");
+      fetchTestimonials();
+    } else {
+      throw new Error("User must be logged in to submit a testimonial");
     }
-  };
+  } catch (error) {
+    console.error("Error adding testimonial: ", error);
+    toast.error("Failed to add testimonial");
+  } finally {
+    setLoading(false);
+  }
+};
 
-  // Fetch testimonials
+
+
+   // Fetch testimonials
   const fetchTestimonials = async () => {
     setLoading(true);
     try {
@@ -67,12 +69,27 @@ function MyState({ children }) {
         QuerySnapshot.forEach((doc) => {
           testimonialArray.push({ ...doc.data(), id: doc.id });
         });
-        setTestimonials(testimonialArray.slice(0, 3)); // Get the latest three testimonials
+        setTestimonials(testimonialArray); // Get all testimonials
         setLoading(false);
       });
-      return () => data;
+      return () => data();
     } catch (error) {
       console.log(error);
+      setLoading(false);
+    }
+  };
+
+     // Delete Testimonial
+    const deleteTestimonial = async (id) => {
+    setLoading(true);
+    try {
+      await deleteDoc(doc(fireDB, "testimonials", id));
+      toast.success("Testimonial deleted successfully");
+      fetchTestimonials(); // Refresh the list after deletion
+    } catch (error) {
+      console.error("Error deleting testimonial: ", error);
+      toast.error("Failed to delete testimonial");
+    } finally {
       setLoading(false);
     }
   };
@@ -309,6 +326,9 @@ function MyState({ children }) {
         createUser, // Add createUser to the context provider
         testimonials,
         addTestimonial,
+        getAllTestimonials: testimonials,
+        deleteTestimonial,
+
       }}
     >
       {children}

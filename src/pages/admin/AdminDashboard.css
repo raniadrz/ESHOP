@@ -1,0 +1,41 @@
+.react-tabs__tab-list {
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid #e0e0e0;
+    padding: 0;
+    margin: 0;
+}
+
+.react-tabs__tab {
+    padding: 12px 24px;
+    cursor: pointer;
+    background-color: #e0f7fa; /* Light blue background */
+    color: #0077b6; /* Blue text color */
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-right: 8px;
+    border-radius: 20px 20px 0 0;
+    border: 2px solid #b3e5fc; /* Light blue border */
+    border-bottom: none;
+    transition: all 0.3s ease;
+}
+
+.react-tabs__tab--selected {
+    background-color: #b3e5fc; /* Selected tab blue */
+    color: #ffffff; /* White text on selected tab */
+    border-color: #0077b6; /* Dark blue border on selected tab */
+    font-size: 1.2rem;
+}
+
+.react-tabs__tab:hover {
+    background-color: #81d4fa; /* Sky blue hover effect */
+    color: #01579b; /* Darker blue text color on hover */
+}
+
+.react-tabs__tab-panel {
+    padding: 3px;
+    border: 2px solid #b3e5fc; /* Light blue border for the panel */
+    border-radius: 0 20px 20px 20px; /* Rounded corners for the panel */
+    background-color: #e1f5fe; /* Very light blue background for the panel */
+    margin-top: -2px; /* Slight overlap with tabs */
+}

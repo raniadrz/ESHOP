@@ -1,12 +1,15 @@
-// cartSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { fireDB } from '../firebase/FirebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-// Helper function to parse prices
+// Helper function to parse and format prices to two decimal places
 const parsePrice = (price) => {
     const parsedPrice = parseFloat(price);
     return isNaN(parsedPrice) ? 0 : parsedPrice;
+};
+
+const formatPrice = (price) => {
+    return (Math.round(price * 100) / 100).toFixed(2);
 };
 
 // Async action to load cart from Firestore
@@ -18,7 +21,10 @@ export const loadCartFromFirestore = createAsyncThunk(
             const cartDoc = await getDoc(cartRef);
             if (cartDoc.exists()) {
                 console.log('Cart loaded from Firestore:', cartDoc.data().items);
-                return cartDoc.data().items || [];
+                return cartDoc.data().items.map(item => ({
+                    ...item,
+                    price: formatPrice(parsePrice(item.price))
+                })) || [];
             }
             console.log('No cart found in Firestore for user:', userId);
             return [];
@@ -46,7 +52,7 @@ export const saveCartToFirestore = createAsyncThunk(
 
 const initialState = JSON.parse(localStorage.getItem('cart'))?.map(item => ({
     ...item,
-    price: parsePrice(item.price),
+    price: formatPrice(parsePrice(item.price)),
     quantity: item.quantity || 1,
     time: isNaN(new Date(item.time).getTime()) ? null : new Date(item.time).toISOString(),
 })) ?? [];
@@ -58,14 +64,14 @@ export const cartSlice = createSlice({
         addToCart(state, action) {
             const newItem = {
                 ...action.payload,
-                price: parsePrice(action.payload.price),
+                price: formatPrice(parsePrice(action.payload.price)),
                 quantity: action.payload.quantity || 1,
                 time: new Date().toISOString(),
             };
             const existingItem = state.find(item => item.id === newItem.id);
             if (existingItem) {
                 existingItem.quantity += newItem.quantity;
-                existingItem.price = newItem.price;
+                existingItem.price = formatPrice(parsePrice(newItem.price));
             } else {
                 state.push(newItem);
             }
@@ -77,12 +83,14 @@ export const cartSlice = createSlice({
             const existingItem = state.find(item => item.id === action.payload);
             if (existingItem) {
                 existingItem.quantity += 1;
+                existingItem.price = formatPrice(parsePrice(existingItem.price));
             }
         },
         decrementQuantity(state, action) {
             const existingItem = state.find(item => item.id === action.payload);
             if (existingItem && existingItem.quantity > 1) {
                 existingItem.quantity -= 1;
+                existingItem.price = formatPrice(parsePrice(existingItem.price));
             }
         },
         clearCart() {
