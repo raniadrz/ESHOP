@@ -5,6 +5,7 @@
   }
   100% {
     transform: translateX(0);
+    background-color:rgb(25, 118, 210);
   }
 }
 
@@ -31,7 +32,8 @@
 
 /* Drawer List Item Styling */
 .drawer-list {
-  background-color: #3e6380;
+  background-color: #0f5193;
+
   color: #fff;
 }
 
