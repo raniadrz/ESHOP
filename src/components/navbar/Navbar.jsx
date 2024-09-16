@@ -54,6 +54,9 @@ const Navbar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  // Logging to check drawer state and device type
+  console.log({ drawerOpen, isMobile });
+
   const navList = (
     <Box
       className="drawer-list"

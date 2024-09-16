@@ -21,7 +21,7 @@
 }
 
 .react-tabs__tab--selected {
-    background-color: #b3e5fc; /* Selected tab blue */
+    background-color: #fbfeff; /* Selected tab blue */
     color: #ffffff; /* White text on selected tab */
     border-color: #0077b6; /* Dark blue border on selected tab */
     font-size: 1.2rem;
@@ -30,6 +30,7 @@
 .react-tabs__tab:hover {
     background-color: #81d4fa; /* Sky blue hover effect */
     color: #01579b; /* Darker blue text color on hover */
+    
 }
 
 .react-tabs__tab-panel {
@@ -38,4 +39,5 @@
     border-radius: 0 20px 20px 20px; /* Rounded corners for the panel */
     background-color: #e1f5fe; /* Very light blue background for the panel */
     margin-top: -2px; /* Slight overlap with tabs */
+    
 }
