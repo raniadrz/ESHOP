@@ -54,9 +54,6 @@ const Navbar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Logging to check drawer state and device type
-  console.log({ drawerOpen, isMobile });
-
   const navList = (
     <Box
       className="drawer-list"
@@ -112,15 +109,16 @@ const Navbar = () => {
                   </ListItemIcon>
                   <ListItemText primary="Profile Setup" sx={{ color: '#fff' }} />
                 </ListItem>
-
-                <ListItem button component={Link} to="/cart">
-                  <ListItemIcon>
-                    <ShoppingCartIcon style={{ color: '#fff' }} />
-                  </ListItemIcon>
-                  <ListItemText primary={`Cart (${cartItems.length})`} sx={{ color: '#fff' }} />
-                </ListItem>
               </>
             )}
+
+            {/* Ensure that Cart is shown regardless of user role */}
+            <ListItem button component={Link} to="/cart">
+              <ListItemIcon>
+                <ShoppingCartIcon style={{ color: '#fff' }} />
+              </ListItemIcon>
+              <ListItemText primary={`Cart (${cartItems.length})`} sx={{ color: '#fff' }} />
+            </ListItem>
 
             <ListItem button onClick={logout}>
               <ListItemIcon>
@@ -181,9 +179,7 @@ const Navbar = () => {
                 </ListItem>
               </>
             )}
-            
           </List>
-
         </Box>
         <IconButton
           edge="end"
