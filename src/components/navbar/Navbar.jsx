@@ -198,7 +198,6 @@ const Navbar = () => {
         PaperProps={{
           sx: {
             width: isMobile ? '100%' : 250,
-            backgroundColor: '#3e6380', // Dark background
             color: '#ffffff', // Light text color
             animation: 'slideIn 0.4s ease-out, fadeIn 1s ease-out', // Drawer animations
           },
