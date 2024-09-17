@@ -9,7 +9,7 @@ import myContext from "../../context/myContext";
 import { auth, fireDB } from "../../firebase/FirebaseConfig";
 import './Signup.css';
 
-const countryList = [
+  const countryList = [
     { name: "Albania" },
     { name: "Andorra" },
     { name: "Armenia" },
@@ -62,8 +62,8 @@ const countryList = [
     { name: "United Kingdom" },
     { name: "Vatican City" }
   ];
-  
 
+  
 const Signup = () => {
     const context = useContext(myContext);
     const { loading, setLoading } = context;
@@ -79,10 +79,50 @@ const Signup = () => {
         role: "user"
     });
 
+    const [errors, setErrors] = useState({
+        name: false,
+        email: false,
+        password: false,
+        dateOfBirth: false,
+        country: false,
+        profession: false,
+    });
+
     const [step, setStep] = useState(1); // Track the current step
 
-    const nextStep = () => setStep((prevStep) => prevStep + 1);
-    const prevStep = () => setStep((prevStep) => prevStep - 1);
+    // Revalidate the form when a field is updated
+    const handleChange = (e, { name, value }) => {
+        setUserSignup({ ...userSignup, [name]: value });
+        
+        // Revalidate the specific field
+        setErrors({ ...errors, [name]: value === "" });
+    };
+
+    const nextStep = () => {
+        if (step === 1) {
+            const newErrors = {
+                name: userSignup.name === "",
+                email: userSignup.email === "",
+                password: userSignup.password === ""
+            };
+            setErrors(newErrors);
+            if (!Object.values(newErrors).includes(true)) {
+                setStep(step + 1);
+            }
+        } else if (step === 2) {
+            const newErrors = {
+                dateOfBirth: userSignup.dateOfBirth === "",
+                country: userSignup.country === "",
+                profession: userSignup.profession === ""
+            };
+            setErrors(newErrors);
+            if (!Object.values(newErrors).includes(true)) {
+                setStep(step + 1);
+            }
+        }
+    };
+
+    const prevStep = () => setStep(step - 1);
 
     const userSignupFunction = async () => {
         if (
@@ -177,25 +217,34 @@ const Signup = () => {
                             fluid
                             label="Full Name"
                             placeholder="Full Name"
+                            name="name"
                             value={userSignup.name}
-                            onChange={(e) => setUserSignup({ ...userSignup, name: e.target.value })}
+                            onChange={handleChange}
+                            error={errors.name && { content: 'Name is required', pointing: 'below' }}
                         />
                         <Form.Input
                             fluid
                             label="Email Address"
                             placeholder="Email Address"
+                            name="email"
                             type="email"
                             value={userSignup.email}
-                            onChange={(e) => setUserSignup({ ...userSignup, email: e.target.value })}
+                            onChange={handleChange}
+                            error={errors.email && { content: 'Email is required', pointing: 'below' }}
                         />
                         <Form.Input
                             fluid
                             label="Password"
                             placeholder="Password"
+                            name="password"
                             type="password"
                             value={userSignup.password}
-                            onChange={(e) => setUserSignup({ ...userSignup, password: e.target.value })}
+                            onChange={handleChange}
+                            error={errors.password && { content: 'Password is required', pointing: 'below' }}
                         />
+                        {Object.values(errors).some(error => error) && (
+                            <div className="error-message">All fields are required</div>
+                        )}
                         <Button.Group fluid style={{ marginTop: '15px' }}>
                             <Button onClick={nextStep} primary>
                                 Next
@@ -210,13 +259,16 @@ const Signup = () => {
                             fluid
                             label="Date of Birth"
                             placeholder="Date of Birth"
+                            name="dateOfBirth"
                             type="date"
                             value={userSignup.dateOfBirth}
-                            onChange={(e) => setUserSignup({ ...userSignup, dateOfBirth: e.target.value })}
+                            onChange={handleChange}
+                            error={errors.dateOfBirth && { content: 'Date of birth is required', pointing: 'below' }}
                         />
                         <Form.Select
                             fluid
                             label="Country"
+                            name="country"
                             options={countryList.map((country) => ({
                                 key: country.name,
                                 text: country.name,
@@ -224,15 +276,21 @@ const Signup = () => {
                             }))}
                             placeholder="Select Country"
                             value={userSignup.country}
-                            onChange={(e, { value }) => setUserSignup({ ...userSignup, country: value })}
+                            onChange={(e, { value }) => handleChange(e, { name: 'country', value })}
+                            error={errors.country && { content: 'Country is required', pointing: 'below' }}
                         />
                         <Form.Input
                             fluid
                             label="Profession"
                             placeholder="Profession"
+                            name="profession"
                             value={userSignup.profession}
-                            onChange={(e) => setUserSignup({ ...userSignup, profession: e.target.value })}
+                            onChange={handleChange}
+                            error={errors.profession && { content: 'Profession is required', pointing: 'below' }}
                         />
+                        {Object.values(errors).some(error => error) && (
+                            <div className="error-message">All fields are required</div>
+                        )}
                         <Button.Group fluid style={{ marginTop: '15px' }}>
                             <Button onClick={prevStep} secondary>
                                 Back

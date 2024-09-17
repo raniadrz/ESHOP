@@ -1,4 +1,3 @@
-// components/admin/Dashboard/TestimonialDetail.jsx
 import React, { useContext, useState } from "react";
 import { DataGrid } from '@mui/x-data-grid';
 import IconButton from '@mui/material/IconButton';
@@ -123,54 +122,6 @@ const TestimonialDetail = () => {
           }}
         />
       </div>
-
-      <Dialog
-        open={openDetailDialog}
-        onClose={handleCloseDetailDialog}
-        fullWidth
-        maxWidth="md"
-        PaperProps={{
-          sx: {
-            padding: 2,
-            backgroundColor: '#f9f9f9',
-          }
-        }}
-      >
-        <DialogTitle sx={{ backgroundColor: '#f1f1f1' }}>Testimonial Details</DialogTitle>
-        <DialogContent id="printable-content">
-          {selectedTestimonial && (
-            <Box sx={{ padding: 2 }}>
-              <Typography variant="h6" sx={{ marginBottom: 2 }}>
-                Testimonial ID: {selectedTestimonial.id}
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography variant="body1" gutterBottom>
-                    <strong>Date:</strong> {formatTimestamp(selectedTestimonial.time)}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    <strong>Name:</strong> {selectedTestimonial.name}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    <strong>Comment:</strong> {selectedTestimonial.comment}
-                  </Typography>
-                  {selectedTestimonial.photoURL && (
-                    <Avatar src={selectedTestimonial.photoURL} alt={selectedTestimonial.name} sx={{ width: 56, height: 56, marginTop: 2 }} />
-                  )}
-                </Grid>
-              </Grid>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: 'space-between' }}>
-          <IconButton onClick={() => window.print()}>
-            <PrintIcon color="primary" />
-          </IconButton>
-          <IconButton onClick={handleCloseDetailDialog}>
-            <CloseIcon />
-          </IconButton>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 };

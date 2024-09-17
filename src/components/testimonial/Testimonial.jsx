@@ -1,13 +1,27 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import MyContext from "../../context/myContext";
 import { CircularProgress, Typography, Box, Avatar, TextField, Button } from "@mui/material";
 import DefaultAvatar from "./avatars/hamster.png"; // Adjust the path to match where you placed the image
 
-const Testimonial = () => {
+const Testimonial = ({ limit = 3 }) => {
   const { testimonials, loading, addTestimonial } = useContext(MyContext);
   const [name, setName] = useState("");
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [randomTestimonials, setRandomTestimonials] = useState([]);
+
+  // Function to shuffle the array
+  const shuffleArray = (array) => {
+    return array.sort(() => Math.random() - 0.5);
+  };
+
+  useEffect(() => {
+    if (testimonials.length > 0) {
+      // Shuffle the testimonials and slice to get `limit` number of random testimonials
+      const shuffled = shuffleArray([...testimonials]);
+      setRandomTestimonials(shuffled.slice(0, limit));
+    }
+  }, [testimonials, limit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,8 +79,9 @@ const Testimonial = () => {
         </Button>
       </Box>
 
+      {/* Display the random testimonials */}
       <Box display="flex" justifyContent="center" flexWrap="wrap" gap={2}>
-        {testimonials.map((testimonial) => (
+        {randomTestimonials.map((testimonial) => (
           <Box key={testimonial.id} sx={{ width: { xs: "100%", sm: "30%" }, p: 2 }}>
             <Box sx={{ textAlign: "center" }}>
               <Avatar

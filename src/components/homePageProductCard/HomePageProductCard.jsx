@@ -1,21 +1,25 @@
 import React, { useContext, useEffect } from "react";
-import { Button, Card, CardContent, CardMedia, Grid, Typography, Container, Chip, CircularProgress, Box } from "@mui/material";
+import { Button, Card, CardContent, CardMedia, Grid, Typography, Container, Chip, CircularProgress, Box, IconButton } from "@mui/material";
 import StarIcon from '@mui/icons-material/Star';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import DeleteIcon from '@mui/icons-material/Delete'; // Import delete icon
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'; // Import cart icon
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import myContext from "../../context/myContext";
-import { addToCart } from "../../redux/cartSlice";
+import { addToCart, incrementQuantity, decrementQuantity, deleteFromCart } from '../../redux/cartSlice';
 
 const HomePageProductCard = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const context = useContext(myContext);
     const { loading, getAllProduct } = context;
 
     const cartItems = useSelector((state) => state.cart);
-    const dispatch = useDispatch();
 
     const addCart = (item) => {
         const itemWithTime = { ...item, time: new Date().toISOString() };
@@ -23,9 +27,28 @@ const HomePageProductCard = () => {
         toast.success("Added to cart");
     };
 
+    const increaseQuantity = (id) => {
+        dispatch(incrementQuantity(id));
+    };
+
+    const decreaseQuantity = (id) => {
+        dispatch(decrementQuantity(id));
+    };
+
+    const deleteCart = (item) => {
+        dispatch(deleteFromCart(item)); // Pass the item instead of just the id
+        toast.success("Deleted from cart");
+    };
+    
+
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cartItems));
     }, [cartItems]);
+
+    // Helper function to find if an item is in the cart and return its quantity
+    const findCartItem = (id) => {
+        return cartItems.find(item => item.id === id);
+    };
 
     return (
         <Container maxWidth="lg" sx={{ textAlign: 'center', mt: 4 }}>
@@ -36,6 +59,8 @@ const HomePageProductCard = () => {
             <Grid container spacing={4} justifyContent="center">
                 {getAllProduct.slice(0, 12).map((item, index) => {
                     const { id, title, price, productImageUrl, productType } = item;
+                    const cartItem = findCartItem(id); // Find the item in the cart
+
                     return (
                         <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
                             <Card 
@@ -87,14 +112,50 @@ const HomePageProductCard = () => {
                                         />
                                     )}
                                 </CardContent>
+
                                 <Box sx={{ p: 2 }}>
-                                    <Button
-                                        onClick={(e) => { e.stopPropagation(); addCart(item); }}
-                                        variant="contained"
-                                        fullWidth
-                                    >
-                                        Add To Cart
-                                    </Button>
+                                    {cartItem ? (
+                                        <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" gap={1}>
+                                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                <IconButton
+                                                    onClick={(e) => { e.stopPropagation(); decreaseQuantity(id); }}
+                                                    size="small"
+                                                    disabled={cartItem.quantity <= 1}
+                                                >
+                                                    <RemoveIcon />
+                                                </IconButton>
+                                                <Typography variant="body1" sx={{ mx: 2 }}>
+                                                    {cartItem.quantity}
+                                                </Typography>
+                                                <IconButton
+                                                    onClick={(e) => { e.stopPropagation(); increaseQuantity(id); }}
+                                                    size="small"
+                                                >
+                                                    <AddIcon />
+                                                </IconButton>
+                                            </Box>
+                                            <Button
+                                            onClick={(e) => { e.stopPropagation(); deleteCart(item); }} // Pass the item object
+                                            variant="outlined"
+                                            color="error"
+                                            startIcon={<DeleteIcon />}
+                                            fullWidth
+                                        >
+                                            Delete From Cart
+                                        </Button>
+
+                                        </Box>
+                                    ) : (
+                                        <Button
+                                            onClick={(e) => { e.stopPropagation(); addCart(item); }}
+                                            variant="outlined" // Outlined button like the delete button
+                                            color="primary"   // Blue color for the Add to Cart button
+                                            startIcon={<ShoppingCartIcon />} // Add a cart icon
+                                            fullWidth
+                                        >
+                                            Add To Cart
+                                        </Button>
+                                    )}
                                 </Box>
                             </Card>
                         </Grid>

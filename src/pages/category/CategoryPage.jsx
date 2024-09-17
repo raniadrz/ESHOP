@@ -1,289 +1,349 @@
 import React, { useContext, useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { Button, Card, CardContent, CardMedia, Grid, Typography, Container, Chip, CircularProgress, Box, IconButton, Dialog, DialogContent, DialogTitle, Slider } from "@mui/material";
+import { TextField, MenuItem } from "@mui/material";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
-import { FaFilter, FaTimes } from "react-icons/fa"; // Import filter and close icons
-import Layout from "../../components/layout/Layout";
-import Loader from "../../components/loader/Loader";
-import myContext from "../../context/myContext";
-import { addToCart, deleteFromCart } from "../../redux/cartSlice";
-import NewReleasesIcon from '@mui/icons-material/NewReleases';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import StarIcon from '@mui/icons-material/Star';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import DeleteIcon from '@mui/icons-material/Delete'; 
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'; 
+import toast from "react-hot-toast";
+import Layout from "../../components/layout/Layout";
+import myContext from "../../context/myContext";
+import { addToCart, deleteFromCart, incrementQuantity, decrementQuantity } from "../../redux/cartSlice"; 
 
 const CategoryPage = () => {
-  const { categoryname } = useParams();
-  const context = useContext(myContext);
-  const { getAllProduct, loading } = context;
+    const { categoryname } = useParams();
+    const context = useContext(myContext);
+    const { getAllProduct, loading } = context;
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const cartItems = useSelector((state) => state.cart);
 
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [selectedCategory2, setSelectedCategory2] = useState([]);
-  const [selectedSubCategory, setSelectedSubCategory] = useState([]);
-  const [availableCategory2, setAvailableCategory2] = useState([]);
-  const [availableSubCategories, setAvailableSubCategories] = useState([]);
-  const [showFilters, setShowFilters] = useState(false); // State for showing/hiding filters
+    // Filter state
+    const [priceRange, setPriceRange] = useState([0, 1000]);
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedCategory2, setSelectedCategory2] = useState("");
+    const [selectedSubcategory, setSelectedSubcategory] = useState("");
+    const [availableCategories, setAvailableCategories] = useState([]);
+    const [availableCategory2, setAvailableCategory2] = useState([]);
+    const [availableSubcategories, setAvailableSubcategories] = useState([]);
+    const [isFilterOpen, setIsFilterOpen] = useState(false); // State to manage filter popup visibility
 
-  useEffect(() => {
-    // Extract available Category2 and SubCategory from the product list for the selected category
-    const category2Set = new Set();
-    const subCategorySet = new Set();
+    useEffect(() => {
+        // Populate filter options based on the available products
+        const categories = Array.from(new Set(getAllProduct.map(product => product.category)));
+        const categories2 = Array.from(new Set(getAllProduct.map(product => product.category2)));
+        const subcategories = Array.from(new Set(getAllProduct.map(product => product.subcategory)));
+        
+        setAvailableCategories(categories);
+        setAvailableCategory2(categories2);
+        setAvailableSubcategories(subcategories);
+    }, [getAllProduct]);
 
-    getAllProduct.forEach((product) => {
-      if (product.category.includes(categoryname)) {
-        category2Set.add(product.category2);
-        subCategorySet.add(product.subcategory);
-      }
-    });
+    // Filter products based on selected filters
+    useEffect(() => {
+        const filtered = getAllProduct.filter((product) => {
+            return (
+                product.category.includes(categoryname) &&
+                product.price >= priceRange[0] &&
+                product.price <= priceRange[1] &&
+                (!selectedCategory || product.category === selectedCategory) &&
+                (!selectedCategory2 || product.category2 === selectedCategory2) &&
+                (!selectedSubcategory || product.subcategory === selectedSubcategory)
+            );
+        });
+        setFilteredProducts(filtered);
+    }, [getAllProduct, categoryname, priceRange, selectedCategory, selectedCategory2, selectedSubcategory]);
 
-    setAvailableCategory2(Array.from(category2Set));
-    setAvailableSubCategories(Array.from(subCategorySet));
-  }, [getAllProduct, categoryname]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
 
-  useEffect(() => {
-    const filtered = getAllProduct.filter((product) => {
-      return (
-        product.category.includes(categoryname) &&
-        product.price >= priceRange[0] &&
-        product.price <= priceRange[1] &&
-        (selectedCategory2.length === 0 ||
-          selectedCategory2.includes(product.category2)) &&
-        (selectedSubCategory.length === 0 ||
-          selectedSubCategory.includes(product.subcategory))
-      );
-    });
-    setFilteredProducts(filtered);
-  }, [
-    getAllProduct,
-    categoryname,
-    priceRange,
-    selectedCategory2,
-    selectedSubCategory,
-  ]);
+    const addCart = (item) => {
+        const itemWithTime = { ...item, time: new Date().toISOString() };
+        dispatch(addToCart(itemWithTime));
+        toast.success("Added to cart");
+    };
 
-  const cartItems = useSelector((state) => state.cart);
-  const dispatch = useDispatch();
+    const deleteCart = (item) => {
+        dispatch(deleteFromCart(item));
+        toast.success("Deleted from cart");
+    };
 
-  const addCart = (item) => {
-    dispatch(addToCart(item));
-    toast.success("Added to cart");
-  };
+    const increaseQuantity = (id) => {
+        dispatch(incrementQuantity(id));
+    };
 
-  const deleteCart = (item) => {
-    dispatch(deleteFromCart(item));
-    toast.success("Deleted from cart");
-  };
+    const decreaseQuantity = (id) => {
+        dispatch(decrementQuantity(id));
+    };
 
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-  }, [cartItems]);
+    useEffect(() => {
+        localStorage.setItem("cart", JSON.stringify(cartItems));
+    }, [cartItems]);
 
-  const handleCategory2Selection = (category) => {
-    setSelectedCategory2((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
-    );
-  };
+    // Helper function to find if an item is in the cart and return its quantity
+    const findCartItem = (id) => {
+        return cartItems.find((item) => item.id === id);
+    };
 
-  const handleSubCategorySelection = (subCategory) => {
-    setSelectedSubCategory((prev) =>
-      prev.includes(subCategory)
-        ? prev.filter((s) => s !== subCategory)
-        : [...prev, subCategory]
-    );
-  };
+    const handleFilterOpen = () => {
+        setIsFilterOpen(true); // Open filter modal
+    };
 
-  const handlePriceChange = (e) => {
-    const { name, value } = e.target;
-    setPriceRange((prevRange) =>
-      name === "min"
-        ? [Number(value), prevRange[1]]
-        : [prevRange[0], Number(value)]
-    );
-  };
+    const handleFilterClose = () => {
+        setIsFilterOpen(false); // Close filter modal
+    };
 
-  const toggleFilters = () => {
-    setShowFilters(!showFilters);
-  };
+    // Handle changes in the price range slider
+    const handlePriceChange = (event, newValue) => {
+        setPriceRange(newValue);
+    };
 
-  return (
-    <Layout>
-      <div className="flex flex-col md:flex-row mt-10">
-        {/* Button to toggle filter visibility */}
-        <button
-          onClick={toggleFilters}
-          className="flex items-center justify-center px-4 py-2 mb-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-md md:hidden"
-        >
-          {showFilters ? <FaTimes className="mr-2" /> : <FaFilter className="mr-2" />}
-          {showFilters ? "Close Filters" : "Open Filters"}
-        </button>
+    return (
+        <Layout>
+            <Container maxWidth="lg" sx={{ textAlign: "center", mt: 4 }}>
+                <Typography variant="h4" gutterBottom>
+                    {categoryname} Products
+                </Typography>
 
-        {/* Filter Sidebar */}
-        <aside
-          className={`w-full md:w-1/4 p-4 bg-gray-100 ${
-            showFilters ? "block" : "hidden"
-          } md:block`}
-        >
-          <h2 className="text-xl font-bold mb-4">Filters</h2>
+                {/* Cloud-style Filter Button */}
+                <Button
+                    onClick={handleFilterOpen}
+                    sx={{
+                        backgroundColor: '#f0f8ff',
+                        borderRadius: '50px',
+                        padding: '10px 30px',
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                        '&:hover': {
+                            backgroundColor: '#e6f0ff',
+                        },
+                        display: 'flex',
+                        alignItems: 'center',
+                        mb: 4
+                    }}
+                >
+                    <FilterListIcon sx={{ mr: 1 }} />
+                    <Typography variant="button" sx={{ fontWeight: 'bold' }}>
+                        Open Filters
+                    </Typography>
+                </Button>
 
-          {/* Price Range Filter */}
-          <div className="mb-4">
-            <h3 className="font-semibold">Price Range</h3>
-            <input
-              type="number"
-              name="min"
-              placeholder="Min"
-              className="border p-2 w-full mb-2"
-              value={priceRange[0]}
-              onChange={handlePriceChange}
-            />
-            <input
-              type="number"
-              name="max"
-              placeholder="Max"
-              className="border p-2 w-full"
-              value={priceRange[1]}
-              onChange={handlePriceChange}
-            />
-          </div>
+                {/* Filter Dialog (Popup) */}
+                <Dialog open={isFilterOpen} onClose={handleFilterClose} maxWidth="sm" fullWidth>
+                    <DialogTitle>Filter Products</DialogTitle>
+                    <DialogContent>
+                        <Box display="flex" flexDirection="column" gap={2} mb={4}>
+                            {/* Price Range */}
+                            <Box>
+                                <Typography variant="h6">Price Range: {`${priceRange[0]}€ - ${priceRange[1]}€`}</Typography>
+                                <Slider
+                                    value={priceRange}
+                                    onChange={handlePriceChange}
+                                    valueLabelDisplay="auto"
+                                    min={0}
+                                    max={1000}
+                                    sx={{ width: '100%' }}
+                                />
+                            </Box>
 
-          {/* Category2 Filter */}
-          <div className="mb-4">
-            <h3 className="font-semibold">Category2</h3>
-            {availableCategory2.map((category) => (
-              <div key={category} className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  id={category}
-                  className="mr-2"
-                  checked={selectedCategory2.includes(category)}
-                  onChange={() => handleCategory2Selection(category)}
-                />
-                <label htmlFor={category}>{category}</label>
-              </div>
-            ))}
-          </div>
+                            {/* Category2 */}
+                            <Box>
+                                <Typography variant="h6">Category 2</Typography>
+                                <TextField
+                                    select
+                                    label="Select Category 2"
+                                    value={selectedCategory2}
+                                    onChange={(e) => setSelectedCategory2(e.target.value)}
+                                    fullWidth
+                                >
+                                    <MenuItem value="">All</MenuItem>
+                                    {availableCategory2.map((category2) => (
+                                        <MenuItem key={category2} value={category2}>
+                                            {category2}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            </Box>
 
-          {/* SubCategory Filter */}
-          <div className="mb-4">
-            <h3 className="font-semibold">SubCategory</h3>
-            {availableSubCategories.map((subCategory) => (
-              <div key={subCategory} className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  id={subCategory}
-                  className="mr-2"
-                  checked={selectedSubCategory.includes(subCategory)}
-                  onChange={() => handleSubCategorySelection(subCategory)}
-                />
-                <label htmlFor={subCategory}>{subCategory}</label>
-              </div>
-            ))}
-          </div>
-        </aside>
+                            {/* Subcategory */}
+                            <Box>
+                                <Typography variant="h6">Subcategory</Typography>
+                                <TextField
+                                    select
+                                    label="Select Subcategory"
+                                    value={selectedSubcategory}
+                                    onChange={(e) => setSelectedSubcategory(e.target.value)}
+                                    fullWidth
+                                >
+                                    <MenuItem value="">All</MenuItem>
+                                    {availableSubcategories.map((subcategory) => (
+                                        <MenuItem key={subcategory} value={subcategory}>
+                                            {subcategory}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                            </Box>
+                        </Box>
 
-        {/* Main Content */}
-        <main className="w-full md:w-3/4 p-4">
-          {/* Heading */}
-          <div className="">
-            <h1 className="text-center mb-5 text-2xl font-semibold first-letter:uppercase">
-              {categoryname}
-            </h1>
-          </div>
+                        {/* Close and Apply Buttons */}
+                        <Box display="flex" justifyContent="space-between" mt={2}>
+                            <Button onClick={handleFilterClose} variant="outlined">
+                                Close
+                            </Button>
+                            <Button onClick={handleFilterClose} variant="contained" color="primary">
+                                Apply Filters
+                            </Button>
+                        </Box>
+                    </DialogContent>
+                </Dialog>
 
-          {/* Product Display */}
-          {loading ? (
-            <div className="flex justify-center">
-              <Loader />
-            </div>
-          ) : (
-            <section className="text-gray-600 body-font">
-              <div className="container px-5 py-5 mx-auto">
-                <div className="flex flex-wrap -m-4 justify-center">
-                  {filteredProducts.length > 0 ? (
-                    <>
-                      {filteredProducts.map((item, index) => {
-                        const { id, title, price, productImageUrl, productType } = item;
+                {loading && <CircularProgress />}
+                
+                <Grid container spacing={4} justifyContent="center">
+                    {filteredProducts.map((item, index) => {
+                        const { id, title, price, productImageUrl, productType, category, category2, subcategory } = item;
+                        const cartItem = findCartItem(id);
+
                         return (
-                          <div key={index} className="p-4 w-full md:w-1/4">
-                            <div className="relative h-full border border-gray-300 rounded-xl overflow-hidden shadow-md cursor-pointer">
-                              
-                              {/* Conditionally render product type icons */}
-                              {productType === "New Product" && (
-                                <div className="absolute top-2 left-2">
-                                  <NewReleasesIcon style={{ color: 'green' }} />
-                                </div>
-                              )}
-                              {productType === "Sales" && (
-                                <div className="absolute top-2 right-2">
-                                  <LocalOfferIcon style={{ color: 'red' }} />
-                                </div>
-                              )}
-                              
-                              <img
-                                onClick={() => navigate(`/productinfo/${id}`)}
-                                className="lg:h-80 h-96 w-full object-cover"
-                                src={productImageUrl}
-                                alt="product"
-                              />
-                              <div className="p-6">
-                                <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">
-                                  E-ctb
-                                </h2>
-                                <h1 className="title-font text-lg font-medium text-gray-900 mb-3">
-                                  {title.substring(0, 25)}
-                                </h1>
-                                <h1 className="title-font text-lg font-medium text-gray-900 mb-3">
-                                  {price}€
-                                </h1>
+                            <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+                                <Card
+                                    sx={{
+                                        height: "100%",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "space-between",
+                                    }}
+                                    onClick={() => navigate(`/productinfo/${id}`)}
+                                >
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            height: 200,
+                                        }}
+                                    >
+                                        <CardMedia
+                                            component="img"
+                                            image={productImageUrl}
+                                            alt="product"
+                                            sx={{
+                                                width: "auto",
+                                                maxHeight: "100%",
+                                                maxWidth: "100%",
+                                                objectFit: "contain",
+                                            }}
+                                        />
+                                    </Box>
+                                    <CardContent sx={{ flexGrow: 1 }}>
+                                        <Typography variant="h6" component="div">
+                                            {title}
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                            {category}, {category2}, {subcategory}
+                                        </Typography>
+                                        <Typography variant="h6" color="textPrimary">
+                                            {price}€
+                                        </Typography>
+                                        {productType === "New Product" && (
+                                            <Chip
+                                                label="New"
+                                                color="success"
+                                                icon={<StarIcon />}
+                                                sx={{ mt: 1 }}
+                                            />
+                                        )}
+                                        {productType === "Sales" && (
+                                            <Chip
+                                                label="Sale"
+                                                color="error"
+                                                icon={<LocalOfferIcon />}
+                                                sx={{ mt: 1 }}
+                                            />
+                                        )}
+                                    </CardContent>
 
-                                <div className="flex justify-center">
-                                  {cartItems.some((p) => p.id === item.id) ? (
-                                    <button
-                                      onClick={() => deleteCart(item)}
-                                      className="bg-blue-700 hover:bg-blue-600 w-full text-white py-[4px] rounded-lg font-bold"
-                                    >
-                                      Delete From Cart
-                                    </button>
-                                  ) : (
-                                    <button
-                                      onClick={() => addCart(item)}
-                                      className="bg-blue-500 hover:bg-blue-600 w-full text-white py-[4px] rounded-lg font-bold"
-                                    >
-                                      Add To Cart
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                                    <Box sx={{ p: 2 }}>
+                                        {cartItem ? (
+                                            <Box
+                                                display="flex"
+                                                flexDirection="column"
+                                                justifyContent="center"
+                                                alignItems="center"
+                                                gap={1}
+                                            >
+                                                <Box
+                                                    display="flex"
+                                                    justifyContent="space-between"
+                                                    alignItems="center"
+                                                >
+                                                    <IconButton
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            decreaseQuantity(id);
+                                                        }}
+                                                        size="small"
+                                                        disabled={cartItem.quantity <= 1}
+                                                    >
+                                                        <RemoveIcon />
+                                                    </IconButton>
+                                                    <Typography
+                                                        variant="body1"
+                                                        sx={{ mx: 2 }}
+                                                    >
+                                                        {cartItem.quantity}
+                                                    </Typography>
+                                                    <IconButton
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            increaseQuantity(id);
+                                                        }}
+                                                        size="small"
+                                                    >
+                                                        <AddIcon />
+                                                    </IconButton>
+                                                </Box>
+                                                <Button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        deleteCart(item);
+                                                    }}
+                                                    variant="outlined"
+                                                    color="error"
+                                                    startIcon={<DeleteIcon />}
+                                                    fullWidth
+                                                >
+                                                    Delete From Cart
+                                                </Button>
+                                            </Box>
+                                        ) : (
+                                            <Button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    addCart(item);
+                                                }}
+                                                variant="outlined"
+                                                color="primary"
+                                                startIcon={<ShoppingCartIcon />}
+                                                fullWidth
+                                            >
+                                                Add To Cart
+                                            </Button>
+                                        )}
+                                    </Box>
+                                </Card>
+                            </Grid>
                         );
-                      })}
-                    </>
-                  ) : (
-                    <div>
-                      <div className="flex justify-center">
-                        <img
-                          className="mb-2"
-                          src="https://cdn-icons-png.flaticon.com/256/11234/11234339.png"
-                          alt=""
-                        />
-                      </div>
-                      <h1 className="text-black text-xl">
-                        No {categoryname} product found
-                      </h1>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </section>
-          )}
-        </main>
-      </div>
-    </Layout>
-  );
+                    })}
+                </Grid>
+            </Container>
+        </Layout>
+    );
 };
 
 export default CategoryPage;
