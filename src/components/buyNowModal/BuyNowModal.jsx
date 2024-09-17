@@ -5,11 +5,36 @@ import {
     DialogBody,
 } from "@material-tailwind/react";
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 const BuyNowModal = ({ addressInfo, setAddressInfo, buyNowFunction }) => {
     const [open, setOpen] = useState(false);
+    const [loginPopupOpen, setLoginPopupOpen] = useState(false); // State for login popup
+    const navigate = useNavigate();
 
-    const handleOpen = () => setOpen(!open);
+    // Check if user is logged in by fetching the user data from localStorage
+    const user = JSON.parse(localStorage.getItem('users'));
+
+    const handleOpen = () => {
+        if (!user) {
+            // If user is not logged in, open the login popup
+            setLoginPopupOpen(true);
+            return;
+        }
+        setOpen(!open); // Toggle modal open/close
+    };
+
+    // Handle login popup button clicks
+    const goToLogin = () => {
+        navigate('/login');
+        setLoginPopupOpen(false); // Close the popup
+    };
+
+    const goToCreateAccount = () => {
+        navigate('/signup');
+        setLoginPopupOpen(false); // Close the popup
+    };
+
     return (
         <>
             <Button
@@ -19,6 +44,8 @@ const BuyNowModal = ({ addressInfo, setAddressInfo, buyNowFunction }) => {
             >
                 Buy now
             </Button>
+
+            {/* Main Buy Now Modal */}
             <Dialog open={open} handler={handleOpen} className=" bg-pink-50">
                 <DialogBody className="">
                     <div className="mb-3">
@@ -64,7 +91,7 @@ const BuyNowModal = ({ addressInfo, setAddressInfo, buyNowFunction }) => {
                                 })
                             }}
                             placeholder='Enter your pincode'
-                            className='bg-pink-50 border border-pink-200 px-2 py-2 w-full rounded-md outline-none text-pink-600 text-pink-600 placeholder-pink-300'
+                            className='bg-pink-50 border border-pink-200 px-2 py-2 w-full rounded-md outline-none text-pink-600 placeholder-pink-300'
                         />
                     </div>
 
@@ -79,7 +106,7 @@ const BuyNowModal = ({ addressInfo, setAddressInfo, buyNowFunction }) => {
                                     mobileNumber: e.target.value
                                 })
                             }}
-                            placeholder='Enter your mobileNumber'
+                            placeholder='Enter your mobile number'
                             className='bg-pink-50 border border-pink-200 px-2 py-2 w-full rounded-md outline-none text-pink-600 placeholder-pink-300'
                         />
                     </div>
@@ -88,7 +115,7 @@ const BuyNowModal = ({ addressInfo, setAddressInfo, buyNowFunction }) => {
                         <select
                             name="paymentMethod"
                             value={addressInfo.paymentMethod}
-                            onChange={(e) =>{
+                            onChange={(e) => {
                                 setAddressInfo({
                                     ...addressInfo,
                                     paymentMethod: e.target.value
@@ -104,7 +131,6 @@ const BuyNowModal = ({ addressInfo, setAddressInfo, buyNowFunction }) => {
 
                     <div className="">
                         <Button
-
                             type="button"
                             onClick={() => {
                                 handleOpen();
@@ -115,7 +141,27 @@ const BuyNowModal = ({ addressInfo, setAddressInfo, buyNowFunction }) => {
                             Buy now
                         </Button>
                     </div>
+                </DialogBody>
+            </Dialog>
 
+            {/* Login Popup Modal */}
+            <Dialog open={loginPopupOpen} handler={() => setLoginPopupOpen(false)} className="bg-white">
+                <DialogBody className="p-6">
+                    <h3 className="text-xl text-center text-pink-600 mb-4">You need to be logged in to place an order</h3>
+                    <div className="flex justify-center space-x-4">
+                        <Button
+                            className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+                            onClick={goToLogin}
+                        >
+                            Login
+                        </Button>
+                        <Button
+                            className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+                            onClick={goToCreateAccount}
+                        >
+                            Create Account
+                        </Button>
+                    </div>
                 </DialogBody>
             </Dialog>
         </>
