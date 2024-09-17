@@ -75,6 +75,14 @@ const Navbar = () => {
           <ListItemText primary="Home" sx={{ color: '#fff' }} />
         </ListItem>
 
+          {/* Cart is now shown to everyone */}
+          <ListItem button component={Link} to="/cart">
+          <ListItemIcon>
+            <ShoppingCartIcon style={{ color: '#fff' }} />
+          </ListItemIcon>
+          <ListItemText primary={`Cart (${cartItems.length})`} sx={{ color: '#fff' }} />
+        </ListItem>
+
         {!user ? (
           <ListItem button component={Link} to="/login">
             <ListItemIcon>
@@ -112,14 +120,6 @@ const Navbar = () => {
               </>
             )}
 
-            {/* Ensure that Cart is shown regardless of user role */}
-            <ListItem button component={Link} to="/cart">
-              <ListItemIcon>
-                <ShoppingCartIcon style={{ color: '#fff' }} />
-              </ListItemIcon>
-              <ListItemText primary={`Cart (${cartItems.length})`} sx={{ color: '#fff' }} />
-            </ListItem>
-
             <ListItem button onClick={logout}>
               <ListItemIcon>
                 <ExitToAppIcon style={{ color: '#fff' }} />
@@ -128,6 +128,8 @@ const Navbar = () => {
             </ListItem>
           </>
         )}
+
+      
       </List>
     </Box>
   );
@@ -149,6 +151,12 @@ const Navbar = () => {
             <ListItem button component={Link} to="/">
               <ListItemText primary="Home" />
             </ListItem>
+
+             {/* Cart is now shown to everyone */}
+             <ListItem button component={Link} to="/cart">
+              <ListItemText primary={`Cart (${cartItems.length})`} />
+            </ListItem>
+            
             {!user ? (
               <ListItem button component={Link} to="/login">
                 <ListItemText primary="Login" />
@@ -171,14 +179,12 @@ const Navbar = () => {
                     </ListItem>
                   </>
                 )}
-                <ListItem button component={Link} to="/cart">
-                  <ListItemText primary={`Cart (${cartItems.length})`} />
-                </ListItem>
                 <ListItem button onClick={logout}>
                   <ListItemText primary="Logout" />
                 </ListItem>
               </>
             )}
+           
           </List>
         </Box>
         <IconButton
