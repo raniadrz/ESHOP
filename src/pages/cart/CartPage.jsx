@@ -13,8 +13,6 @@ import {
     deleteFromCart,
     incrementQuantity,
     orderSuccessful,
-    loadCartFromFirestore,
-    saveCartToFirestore
 } from "../../redux/cartSlice";
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import emailjs from 'emailjs-com';
@@ -59,29 +57,7 @@ const CartPage = () => {
         localStorage.setItem('cart', JSON.stringify(cartItems));
     }, [cartItems]);
 
-    // Load the cart from Firestore whenever the user logs in
-    useEffect(() => {
-        const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                dispatch(loadCartFromFirestore(user.uid));
-            }
-        });
-
-        return () => unsubscribe();
-    }, [dispatch]);
-
-    // Save the cart to Firestore whenever cartItems change
-    useEffect(() => {
-        const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                dispatch(saveCartToFirestore({ userId: user.uid, cartItems }));
-            }
-        });
-
-        return () => unsubscribe();
-    }, [dispatch, cartItems]);
+   
 
     // Buy Now Function
     const [addressInfo, setAddressInfo] = useState({
@@ -100,13 +76,11 @@ const CartPage = () => {
         )
     });
 
-    
-    // Example of using EmailJS in your frontend React component
     const sendOrderConfirmationEmail = (order) => {
         const templateParams = {
-            to_email: order.email, // Use the logged-in user's email address
+            to_email: order.email,
             order_id: order.id,
-            order_details: JSON.stringify(order.cartItems, null, 2), // Use the cart items or any other order details
+            order_details: JSON.stringify(order.cartItems, null, 2),
             message: `Thank you for your purchase. Please make the deposit to the following IBANs:
             - Eurobank IBAN: GR12 3456 7891 2345
             - Piraeus IBAN: GR23 4567 8901 2345
@@ -123,9 +97,6 @@ const CartPage = () => {
                 console.error('Error sending email:', error);
             });
     };
-
-
-
 
     const buyNowFunction = async () => {
         if (addressInfo.name === "" || addressInfo.address === "" || addressInfo.pincode === "" || addressInfo.mobileNumber === "") {
@@ -179,6 +150,7 @@ const CartPage = () => {
             toast.error("Failed to place order. Please try again.");
         }
     };
+
     
     
     
