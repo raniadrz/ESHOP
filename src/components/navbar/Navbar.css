@@ -1,42 +1,64 @@
-/* Drawer Animation */
-@keyframes slideIn {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(0);
-    background-color:rgb(56, 87, 118);
-  }
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 /* Navbar Title Styling */
 .navbar-title {
   font-size: 1.5rem;
   font-weight: bold;
+  color: #ffffff;
+  text-transform: uppercase;
 }
 
-/* Navbar Links Styling for Desktop */
+/* Navbar Links for Desktop */
 .navbar-links {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: #ffffff;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+}
+
+/* Change background to orange when hovered */
+.navbar-links a:hover,
+.navbar-links a:focus,
+.navbar-links a:active {
+  background-color: orange;
+  border-radius: 5px;
+}
+
+/* Drawer Content */
+.drawer-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #136ace;
+  color: #ffffff;
+}
+
+/* Profile Section in Drawer */
+.profile-section {
+  padding: 20px 0;
+  background-color: #378ff2;
+}
+
+.profile-section .MuiTypography-h6 {
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 /* Drawer List Item Styling */
-.drawer-list {
-  background-color: #0f5193;
-
-  color: #fff;
+.nav-list .MuiListItem-root {
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
 }
 
-.drawer-list .MuiListItemIcon-root {
-  color: #fff;
+.nav-list .MuiListItem-root:hover {
+  background-color: #12437b;
+  border-radius: 5px;
+}
+
+/* Drawer Divider */
+.MuiDivider-root {
+  background-color: rgba(255, 255, 255, 0.2);
 }

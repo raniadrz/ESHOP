@@ -135,7 +135,7 @@ const ProductInfo = () => {
                                     <p className="product-price">Price: {product?.price}€</p>
 
                                     {/* Rating Section */}
-                                    <div className="product-rating">
+                                    {/* <div className="product-rating">
                                         <p>Rating: {averageRating.toFixed(1)} / 5</p>
                                         <div className="rating-hearts">
                                             {[1, 2, 3, 4, 5].map((value) => (
@@ -149,7 +149,7 @@ const ProductInfo = () => {
                                                 />
                                             ))}
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     <div className="cart-actions">
                                         {cartItems.some((p) => p.id === product.id) ? (

@@ -23,8 +23,8 @@
 .product-image-container {
     position: relative;
     flex: 1;
-    max-width: 400px; /* Fix the container to 400px width */
-    max-height: 400px; /* Fix the container to 400px height */
+    max-width: 300px; /* Fix the container to 400px width */
+    max-height: 500px; /* Fix the container to 400px height */
     width: 100%;
     height: 100%;
     overflow: hidden; /* Hide any overflow to maintain the 400x400 size */

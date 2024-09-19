@@ -1,0 +1,32 @@
+/* Apply margin to all main sections */
+.section {
+    margin-top: 20px;  /* Top margin */
+    margin-bottom: 20px;  /* Bottom margin */
+  }
+  
+  /* For specific sections */
+  .hero-section {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+  
+  .category-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .search-bar-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .testimonial-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .product-card-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  

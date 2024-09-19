@@ -1,7 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button, Card, CardContent, CardMedia, Grid, Typography, Container, Chip, CircularProgress, Box, IconButton, Dialog, DialogContent, DialogTitle, Slider } from "@mui/material";
-import { TextField, MenuItem } from "@mui/material";
-
+import { Button, Card, CardContent, CardMedia, Grid, Typography, Container, Chip, CircularProgress, Box, IconButton, Dialog, DialogContent, DialogTitle, Slider, TextField, MenuItem } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -9,12 +7,13 @@ import StarIcon from '@mui/icons-material/Star';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import DeleteIcon from '@mui/icons-material/Delete'; 
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'; 
+import DeleteIcon from '@mui/icons-material/Delete';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import Pagination from '@mui/material/Pagination';
 import toast from "react-hot-toast";
 import Layout from "../../components/layout/Layout";
 import myContext from "../../context/myContext";
-import { addToCart, deleteFromCart, incrementQuantity, decrementQuantity } from "../../redux/cartSlice"; 
+import { addToCart, deleteFromCart, incrementQuantity, decrementQuantity } from "../../redux/cartSlice";
 
 const CategoryPage = () => {
     const { categoryname } = useParams();
@@ -35,12 +34,16 @@ const CategoryPage = () => {
     const [availableSubcategories, setAvailableSubcategories] = useState([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false); // State to manage filter popup visibility
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 12;
+
     useEffect(() => {
         // Populate filter options based on the available products
         const categories = Array.from(new Set(getAllProduct.map(product => product.category)));
         const categories2 = Array.from(new Set(getAllProduct.map(product => product.category2)));
         const subcategories = Array.from(new Set(getAllProduct.map(product => product.subcategory)));
-        
+
         setAvailableCategories(categories);
         setAvailableCategory2(categories2);
         setAvailableSubcategories(subcategories);
@@ -59,6 +62,7 @@ const CategoryPage = () => {
             );
         });
         setFilteredProducts(filtered);
+        setCurrentPage(1);  // Reset to first page after applying a new filter
     }, [getAllProduct, categoryname, priceRange, selectedCategory, selectedCategory2, selectedSubcategory]);
 
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -104,10 +108,51 @@ const CategoryPage = () => {
         setPriceRange(newValue);
     };
 
+    // Calculate products to display for the current page
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+    // Handle pagination
+    const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handlePageChange = (event, page) => {
+        setCurrentPage(page);
+    };
+
+    const handleDirectPageInput = (event) => {
+        const pageNumber = parseInt(event.target.value, 10);
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
     return (
         <Layout>
             <Container maxWidth="lg" sx={{ textAlign: "center", mt: 4 }}>
-                <Typography variant="h4" gutterBottom>
+                {/* Updated Typography with orange, bold font and margin-bottom for gap */}
+                <Typography 
+                    variant="h4" 
+                    gutterBottom 
+                    sx={{ 
+                        color: '#ff9800',  // Orange color
+                        fontWeight: 'bold',  // Bold font weight
+                        fontFamily: 'Arial, sans-serif',  // Custom font (you can change it to your preferred font)
+                        mb: 4  // Adds margin-bottom for a gap between the title and the grid
+                    }}
+                >
                     {categoryname} Products
                 </Typography>
 
@@ -204,8 +249,18 @@ const CategoryPage = () => {
 
                 {loading && <CircularProgress />}
                 
-                <Grid container spacing={4} justifyContent="center">
-                    {filteredProducts.map((item, index) => {
+                <Grid 
+                    container 
+                    spacing={4} 
+                    justifyContent="center"
+                    sx={{ 
+                        background: 'linear-gradient(to bottom, #ffffff, #1976d2, #ffffff)', // Blue and white mix
+                        padding: '20px', // Add padding inside the grid
+                        borderRadius: '10px', // Adds a slight border-radius to the grid background
+                        mt: 4  // Adds margin-top to separate the grid from the title
+                    }}
+                >
+                    {currentProducts.map((item, index) => {
                         const { id, title, price, productImageUrl, productType, category, category2, subcategory } = item;
                         const cartItem = findCartItem(id);
 
@@ -341,6 +396,20 @@ const CategoryPage = () => {
                         );
                     })}
                 </Grid>
+
+               
+
+                {/* Jump to Specific Page */}
+                <Box display="flex" justifyContent="center" alignItems="center" mt={4}>
+                    <Pagination
+                        count={totalPages}
+                        page={currentPage}
+                        onChange={handlePageChange}
+                        siblingCount={1}
+                        boundaryCount={1}
+                        sx={{ ml: 2 }}
+                    />
+                </Box>
             </Container>
         </Layout>
     );

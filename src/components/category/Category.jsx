@@ -27,57 +27,37 @@ const category = [
         image: 'https://www.thoughtco.com/thmb/KTKF0mDSAXCdLJQcAJq7QLSwBFw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-622013488-55a1fad50d93429fb927087e1f18cff8.jpg',
         name: 'Reptile'
     },
-]
+];
 
 const Category = () => {
     // navigate
     const navigate = useNavigate();
     return (
-        <div>
-            <div className="flex flex-col">
-                {/* main 1 */}
-                <div className="flex overflow-x-scroll lg:justify-center hide-scroll-bar">
-                    {/* main 2 */}
-                    <div className="flex">
-                        {/* category */}
-                        {category.map((item, index) => {
-                            return (
-                                <div key={index} className="px-1 lg:px-11">
-                                    {/* Image */}
-                                    <div onClick={() => navigate(`/category/${item.name}`)} className="w-16 h-16 lg:w-24 lg:h-24 max-w-xs rounded-full bg-blue-500 transition-all hover:bg-blue-400 cursor-pointer mb-1">
-                                        <div className="flex justify-center items-center h-full">
-                                            {/* Image tag */}
-                                            <img src={item.image} alt={item.name} className="oval-image" />
-                                        </div>
+        <div className="category-container">
+            <div className="flex overflow-x-scroll lg:justify-center hide-scroll-bar">
+                <div className="flex">
+                    {/* category */}
+                    {category.map((item, index) => {
+                        return (
+                            <div key={index} className="category-item px-1 lg:px-11">
+                                {/* Image */}
+                                <div
+                                    onClick={() => navigate(`/category/${item.name}`)}
+                                    className="category-circle w-16 h-16 lg:w-24 lg:h-24 max-w-xs transition-all cursor-pointer mb-1"
+                                >
+                                    <div className="flex justify-center items-center h-full">
+                                        <img src={item.image} alt={item.name} className="oval-image" />
                                     </div>
-
-                                    {/* Name Text */}
-                                    <h1 className='text-sm lg:text-lg text-center font-medium title-font first-letter:uppercase'>{item.name}</h1>
                                 </div>
-                            )
-                        })}
-                    </div>
+                                {/* Name Text */}
+                                <h1 className='category-text text-sm lg:text-lg text-center font-medium title-font first-letter:uppercase'>{item.name}</h1>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
-
-            {/* style */}
-            <style dangerouslySetInnerHTML={{ __html: `
-                .hide-scroll-bar {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
-                }
-                .hide-scroll-bar::-webkit-scrollbar {
-                    display: none;
-                }
-                .oval-image {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    border-radius: 100%;
-                }
-            ` }} />
         </div>
     );
-}
+};
 
 export default Category;

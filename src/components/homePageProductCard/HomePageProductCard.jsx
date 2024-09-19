@@ -11,6 +11,7 @@ import { useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import myContext from "../../context/myContext";
 import { addToCart, incrementQuantity, decrementQuantity, deleteFromCart } from '../../redux/cartSlice';
+import "./HomePageProductCard.css";
 
 const HomePageProductCard = () => {
     const navigate = useNavigate();
@@ -39,7 +40,6 @@ const HomePageProductCard = () => {
         dispatch(deleteFromCart(item)); // Pass the item instead of just the id
         toast.success("Deleted from cart");
     };
-    
 
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cartItems));
@@ -52,11 +52,31 @@ const HomePageProductCard = () => {
 
     return (
         <Container maxWidth="lg" sx={{ textAlign: 'center', mt: 4 }}>
-            <Typography variant="h4" gutterBottom>
+            {/* Updated Typography with orange, bold font and margin-bottom for gap */}
+            <Typography 
+                variant="h4" 
+                gutterBottom 
+                sx={{ 
+                    color: '#ff9800',  // Orange color
+                    fontWeight: 'bold',  // Bold font weight
+                    fontFamily: 'Arial, sans-serif',  // Custom font (you can change it to your preferred font)
+                    mb: 4  // Adds margin-bottom for a gap between the title and the grid
+                }}
+            >
                 Bestselling Products
             </Typography>
             {loading && <CircularProgress />}
-            <Grid container spacing={4} justifyContent="center">
+            <Grid 
+                container 
+                spacing={4} 
+                justifyContent="center"
+                sx={{ 
+                    background: 'linear-gradient(to bottom, #ffffff ,#1976d2, #ffffff )', // Blue and white mix
+                    padding: '20px', // Add padding inside the grid
+                    borderRadius: '10px', // Adds a slight border-radius to the grid background
+                    mt: 4  // Adds margin-top to separate the grid from the title
+                }}
+            >
                 {getAllProduct.slice(0, 12).map((item, index) => {
                     const { id, title, price, productImageUrl, productType } = item;
                     const cartItem = findCartItem(id); // Find the item in the cart

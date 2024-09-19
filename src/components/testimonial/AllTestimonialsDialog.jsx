@@ -2,10 +2,25 @@ import React, { useContext } from "react";
 import { Dialog, DialogTitle, DialogContent, Typography, Box, Avatar, IconButton } from "@mui/material";
 import MyContext from "../../context/myContext";
 import CloseIcon from "@mui/icons-material/Close";
-import DefaultAvatar from "./avatars/hamster.png"; // Adjust the path to match where you placed the image
+
+// Import all avatar images
+import Avatar1 from "./avatars/hamster.png"; // Adjust the paths to your actual avatars
+import Avatar2 from "./avatars/cat.png";
+import Avatar3 from "./avatars/dog.png";
+import Avatar4 from "./avatars/rabbit.png";
+import Avatar5 from "./avatars/lion.png";
+
+// Create an array of all avatar images
+const avatarArray = [Avatar1, Avatar2, Avatar3, Avatar4, Avatar5];
 
 const AllTestimonialsDialog = ({ open, onClose }) => {
     const { testimonials } = useContext(MyContext);
+
+    // Function to select a random avatar for each testimonial
+    const getRandomAvatar = () => {
+        const randomIndex = Math.floor(Math.random() * avatarArray.length);
+        return avatarArray[randomIndex];
+    };
 
     return (
         <Dialog
@@ -44,7 +59,7 @@ const AllTestimonialsDialog = ({ open, onClose }) => {
                         <Box key={testimonial.id} sx={{ textAlign: "center", mb: 2 }}>
                             <Avatar
                                 alt="testimonial"
-                                src={DefaultAvatar}
+                                src={getRandomAvatar()} // Use the random avatar function
                                 sx={{ width: 80, height: 80, mx: "auto", mb: 2 }}
                             />
                             <Typography variant="body1" color="textSecondary" gutterBottom>
