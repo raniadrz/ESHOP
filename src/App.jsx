@@ -28,7 +28,6 @@ import PPolicy from "./pages/footer/privacyPolicy/privacyPolicy";
 import ReturnPolicy from './pages/footer/returnPolicy/ReturnPolicy';
 import UserSettings from './components/user/ProfileDetail';
 
-import SpeedInsights from '@vercel/speed-insights'; // Import directly without destructuring
 
 function App() {
   return (
@@ -76,7 +75,7 @@ function App() {
         </Routes>
         <Toaster />
       </Router>
-      <SpeedInsights /> {/* This should be outside of Router to track page changes */}
+      
     </MyState>
   );
 }
