@@ -8,7 +8,7 @@ import { Provider } from "react-redux";
 import { store } from './redux/store';
 
 
-import SpeedInsights from '@vercel/speed-insights'; // Import directly without destructuring
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -16,9 +16,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   
         <ThemeProvider>
           <App />
+      
         </ThemeProvider>
 
     </Provider>,
-    <SpeedInsights />
+
   </React.StrictMode>
 );
