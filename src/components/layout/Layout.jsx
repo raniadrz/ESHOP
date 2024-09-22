@@ -1,6 +1,6 @@
 import Footer from "../footer/Footer";
 import Navbar from "../navbar/Navbar";
-import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 /* eslint-disable react/prop-types */
 const Layout = ({ children }) => {
@@ -11,7 +11,7 @@ const Layout = ({ children }) => {
                 {children}
             </div>
             <Footer />
-            <Analytics debug={true} /> {/* This will log debug info to the console */}
+            <SpeedInsights/>
         </div>
     );
 }
