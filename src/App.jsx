@@ -12,6 +12,7 @@ import AddProductPage from "./pages/admin/AddProductPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UpdateProductPage from "./pages/admin/UpdateProductPage";
 import CartPage from "./pages/cart/CartPage";
+import Cart from"./pages/cart/CartPageNav";
 import CategoryPage from "./pages/category/CategoryPage";
 import HomePage from "./pages/home/HomePage";
 import NoPage from "./pages/noPage/NoPage";
@@ -39,6 +40,7 @@ function App() {
           <Route path="/returnpolicy" element={<ReturnPolicy />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
+          <Route path="/cartNav" element={<Cart />}/>
           <Route path="/productinfo/:id" element={<ProductInfo />} />
           <Route path="/cart" element={<CartPage />} /> {/* CartPage accessible to everyone */}
           <Route path="/signup" element={<Signup />} />

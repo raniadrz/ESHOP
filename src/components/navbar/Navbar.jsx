@@ -141,7 +141,7 @@ const Navbar = () => {
               <Button component={Link} to="/" sx={{ color: '#fff' }}>
                 Home
               </Button>
-              <Button component={Link} to="/cart" sx={{ color: '#fff' }}>
+              <Button component={Link} to="/cartNav" sx={{ color: '#fff' }}>
                 Cart ({cartItems.length})
               </Button>
               {!user ? (
