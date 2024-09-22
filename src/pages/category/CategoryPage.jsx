@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button, Card, CardContent, CardMedia, Grid, Typography, Container, Chip, CircularProgress, Box, IconButton, Dialog, DialogContent, DialogTitle, Slider, TextField, MenuItem } from "@mui/material";
+import {
+    Button, Card, CardContent, CardMedia, Grid, Typography, Container, Chip, CircularProgress, Box, IconButton, Dialog, DialogContent, DialogTitle, Slider, TextField, MenuItem, Pagination
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -9,11 +11,65 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import Pagination from '@mui/material/Pagination';
 import toast from "react-hot-toast";
 import Layout from "../../components/layout/Layout";
 import myContext from "../../context/myContext";
 import { addToCart, deleteFromCart, incrementQuantity, decrementQuantity } from "../../redux/cartSlice";
+import Category from "../../components/category/Category";
+
+// Create Hero Section Component
+const HeroSection = ({ category }) => {
+    // Define hero images with valid categories
+    const heroImages = {
+        Dog: [
+            "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2023/07/top-20-small-dog-breeds.jpeg.jpg",
+            "https://topdoghealth.com/wp-content/uploads/top-10-nutrients-dogs-need-for-healthy-joints.png"
+        ],
+        Cat: [
+            "https://static.vecteezy.com/system/resources/thumbnails/022/963/918/small_2x/ai-generative-cute-cat-isolated-on-solid-background-photo.jpg",
+            "https://static.vecteezy.com/system/resources/thumbnails/024/399/355/small_2x/three-cool-cats-in-sunglasses-illustration-ai-generative-free-photo.jpg"
+        ],
+        Bird: [
+            "https://static.vecteezy.com/system/resources/previews/036/725/033/non_2x/ai-generated-singing-birds-musical-notes-and-blossoming-branches-set-a-harmonious-scene-free-photo.jpg",
+            "https://t4.ftcdn.net/jpg/07/54/80/09/360_F_754800963_sKRpASsdPJ2Jo076lfjOQZA4sDiizgsv.jpg"
+        ],
+        Fish: [
+            "https://t4.ftcdn.net/jpg/02/53/61/69/360_F_253616948_za22DUrpvoM6aBDyPZxXDXf1OVNZFhL4.jpg",
+            "https://us.123rf.com/450wm/antos777/antos7771411/antos777141100042/34007339-zebrasoma-flavescens-yellow-tang-saltwater-fish.jpg?ver=6"
+        ],
+        'Little Pet': [
+            "https://www.idausa.org/assets/components/phpthumbof/cache/blogmain-group-of-rabbits-2056157612-0922-source-shutterstock.abe80ebac597b762e0e0fbf0e85555c8.jpg",
+            "https://t4.ftcdn.net/jpg/08/38/25/19/360_F_838251998_IGj2uzSlwRZUfmu9oGvOqUfViSaAhKTY.jpg"
+        ],
+        Reptile: [
+            "https://www.anywhere.com/img-a/flora-fauna/reptile/iguana-verde/green-iguana2.jpg?q=85&w=1280",
+            "https://d18lev1ok5leia.cloudfront.net/chesapeakebay/field-guide/rough-green-snake/_670xAUTO_crop_center-center_none/roughgreensnakefieldguide_thumb-01.jpg"
+        ]
+    };
+
+    // Get the correct images based on the category, default to an empty array
+    const categoryImages = heroImages[category] || [];
+
+    // Check if categoryImages array is valid and contains at least two images
+    if (categoryImages.length < 2) {
+        return null; // Prevent rendering if not enough images are available
+    }
+
+    return (
+        <Box sx={{ display: 'flex', gap: 2, mb: 4, justifyContent: 'center' }}>
+            <img
+                src={categoryImages[0]}
+                alt={`${category} Hero 1`}
+                style={{ width: '25%', borderRadius: '10px', objectFit: 'cover' }}
+            />
+            <img
+                src={categoryImages[1]}
+                alt={`${category} Hero 2`}
+                style={{ width: '50%', borderRadius: '10px', objectFit: 'cover' }}
+            />
+        </Box>
+    );
+};
 
 const CategoryPage = () => {
     const { categoryname } = useParams();
@@ -142,6 +198,12 @@ const CategoryPage = () => {
     return (
         <Layout>
             <Container maxWidth="lg" sx={{ textAlign: "center", mt: 4 }}>
+                {/* Hero Section */}
+                <HeroSection category={categoryname} />
+
+                {/* Categories Section */}
+                <Category />
+
                 {/* Updated Typography with orange, bold font and margin-bottom for gap */}
                 <Typography 
                     variant="h4" 
@@ -248,7 +310,7 @@ const CategoryPage = () => {
                 </Dialog>
 
                 {loading && <CircularProgress />}
-                
+
                 <Grid 
                     container 
                     spacing={4} 
@@ -396,8 +458,6 @@ const CategoryPage = () => {
                         );
                     })}
                 </Grid>
-
-               
 
                 {/* Jump to Specific Page */}
                 <Box display="flex" justifyContent="center" alignItems="center" mt={4}>
