@@ -12,7 +12,7 @@ import AddProductPage from "./pages/admin/AddProductPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UpdateProductPage from "./pages/admin/UpdateProductPage";
 import CartPage from "./pages/cart/CartPage";
-import Cart from"./pages/cart/CartPageNav";
+import Cart from "./pages/cart/CartPageNav";
 import CategoryPage from "./pages/category/CategoryPage";
 import HomePage from "./pages/home/HomePage";
 import NoPage from "./pages/noPage/NoPage";
@@ -28,8 +28,7 @@ import PPolicy from "./pages/footer/privacyPolicy/privacyPolicy";
 import ReturnPolicy from './pages/footer/returnPolicy/ReturnPolicy';
 import UserSettings from './components/user/ProfileDetail';
 
-
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import SpeedInsights from '@vercel/speed-insights'; // Import directly without destructuring
 
 function App() {
   return (
@@ -43,14 +42,12 @@ function App() {
           <Route path="/returnpolicy" element={<ReturnPolicy />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
-          <Route path="/cartNav" element={<Cart />}/>
+          <Route path="/cartNav" element={<Cart />} />
           <Route path="/productinfo/:id" element={<ProductInfo />} />
-          <Route path="/cart" element={<CartPage />} /> {/* CartPage accessible to everyone */}
+          <Route path="/cart" element={<CartPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/category/:categoryname" element={<CategoryPage />} />
-
-          
           <Route path="/user-dashboard" element={
             <ProtectedRouteForUser>
               <UserSettings />
@@ -79,7 +76,7 @@ function App() {
         </Routes>
         <Toaster />
       </Router>
-      <SpeedInsights />
+      <SpeedInsights /> {/* This should be outside of Router to track page changes */}
     </MyState>
   );
 }
