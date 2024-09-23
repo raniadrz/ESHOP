@@ -260,7 +260,7 @@ const CategoryPage = () => {
 
                             {/* Category2 */}
                             <Box>
-                                <Typography variant="h6">Category 2</Typography>
+                                <Typography variant="h6">Category </Typography>
                                 <TextField
                                     select
                                     label="Select Category 2"
@@ -279,7 +279,7 @@ const CategoryPage = () => {
 
                             {/* Subcategory */}
                             <Box>
-                                <Typography variant="h6">Subcategory</Typography>
+                                <Typography variant="h6">Sub Category</Typography>
                                 <TextField
                                     select
                                     label="Select Subcategory"

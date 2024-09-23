@@ -148,22 +148,8 @@ const HomePage = () => {
 
 
 
-      {/* Snackbar to display project message */}
-      <Snackbar
-        open={popupVisible}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        onClose={() => setPopupVisible(false)}
-      >
-        <SnackbarContent
-          sx={{
-            backgroundColor: "#1976d2",
-            color: "white",
-            fontSize: "1.25rem",
-            textAlign: "center",
-          }}
-          message="This is not a real store."
-        />
-      </Snackbar>
+      
+    
     </Layout>
   );
 };

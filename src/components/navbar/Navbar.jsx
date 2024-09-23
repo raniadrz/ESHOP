@@ -78,7 +78,7 @@ const Navbar = () => {
           <ListItemText primary="Home" sx={{ color: '#fff' }} />
         </ListItem>
 
-        <ListItem button component={Link} to="/cart">
+        <ListItem button component={Link} to="/cartNav">
           <ListItemIcon>
             <ShoppingCartIcon sx={{ color: '#fff' }} />
           </ListItemIcon>
@@ -133,7 +133,7 @@ const Navbar = () => {
               component={Link}
               to="/"
               className="navbar-title"
-              sx={{ textDecoration: 'none', color: 'inherit' }}
+              sx={{ textDecoration: 'none', color: '#fff' }}
             >
               Chic Tails Boutique
             </Typography>
