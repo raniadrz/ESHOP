@@ -83,8 +83,6 @@ const OrderDetail = () => {
     status: order.status,
     serial: index + 1,
     name: order.addressInfo?.name || "N/A",
-    address: order.addressInfo?.address || "N/A",
-    pincode: order.addressInfo?.pincode || "N/A",
     mobileNumber: order.addressInfo?.mobileNumber || "N/A",
     email: order.email || "N/A",
     date: formatDate(order.date),
@@ -139,12 +137,10 @@ const OrderDetail = () => {
       }
     },
     { field: 'name', headerName: 'Name', flex: 2.5, headerAlign: 'center', align: 'center' },
-    { field: 'address', headerName: 'Address', flex: 3, headerAlign: 'center', align: 'center' },
-    { field: 'pincode', headerName: 'Pincode', flex: 1.5, headerAlign: 'center', align: 'center' },
     { field: 'mobileNumber', headerName: 'Phone Number', flex: 2, headerAlign: 'center', align: 'center' },
     { field: 'email', headerName: 'Email', flex: 2.5, headerAlign: 'center', align: 'center' },
     { field: 'date', headerName: 'Date', flex: 2, headerAlign: 'center', align: 'center' },
-    { field: 'totalItems', headerName: 'Total Items', flex: 1, headerAlign: 'center', align: 'center' },
+    { field: 'totalItems', headerName: 'Total Items', flex: 1.5, headerAlign: 'center', align: 'center' },
     { field: 'totalPrice', headerName: 'Total Price', flex: 1.5, headerAlign: 'center', align: 'center' },
     {
       field: 'actions',
@@ -244,7 +240,7 @@ const OrderDetail = () => {
                     <strong>Email:</strong> {selectedOrder.email}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    <strong>Payment Method:</strong> {selectedOrder.paymentMethod}
+                    <strong>Payment Method:</strong> {selectedOrder.addressInfo?.paymentMethod}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={6}>
