@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PrintIcon from '@mui/icons-material/Print';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Grid } from '@mui/material';
+import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Grid, MenuItem, Select } from '@mui/material';
 import myContext from "../../../context/myContext";
 import Loader from "../../loader/Loader";
 
@@ -14,17 +14,33 @@ const OrderDetail = () => {
 
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [editStatusId, setEditStatusId] = useState(null); // Track which row's status is being edited
+  const [tempStatus, setTempStatus] = useState(null); // Store temporary status during editing
 
+  // Possible order statuses
+  const orderStatuses = [
+    "Confirmed",
+    "Waiting",
+    "Bank Payment OK",
+    "Bank Payment NOT",
+    "Shipped",
+    "Delivered",
+    "Cancelled"
+  ];
+
+  // Open the dialog to show order details
   const handleClickOpenDetailDialog = (order) => {
     setSelectedOrder(order);
     setOpenDetailDialog(true);
   };
 
+  // Close the dialog
   const handleCloseDetailDialog = () => {
     setOpenDetailDialog(false);
     setSelectedOrder(null);
   };
 
+  // Handle order deletion
   const handleDelete = async (orderId) => {
     setLoading(true);
     try {
@@ -41,14 +57,30 @@ const OrderDetail = () => {
     window.print();
   };
 
+  // Handle status change and update in Firebase
+  const handleStatusChange = async (newStatus, orderId) => {
+    setLoading(true);
+    try {
+      await updateOrderStatus(orderId, newStatus); // Save the new status to Firebase
+      setEditStatusId(null); // Close the dropdown (back to text)
+    } catch (error) {
+      console.error("Error updating status: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Format the date
   const formatDate = (date) => {
     if (!date) return "N/A";
     if (date.toDate) return date.toDate().toLocaleString('en-GB');
     return new Date(date).toLocaleString('en-GB');
   };
 
+  // Render rows for DataGrid
   const rows = getAllOrder.map((order, index) => ({
     id: order.id,
+    status: order.status,
     serial: index + 1,
     name: order.addressInfo?.name || "N/A",
     address: order.addressInfo?.address || "N/A",
@@ -62,8 +94,50 @@ const OrderDetail = () => {
     order, // Pass full order object for dialog
   }));
 
+  // DataGrid columns
   const columns = [
     { field: 'id', headerName: 'Order ID', flex: 1.5, headerAlign: 'center', align: 'center' },
+    {
+      field: 'status',
+      headerName: 'Status',
+      flex: 3,
+      headerAlign: 'center',
+      align: 'center',
+      renderCell: (params) => {
+        const isEditing = params.row.id === editStatusId;
+        return (
+          <Box>
+            {isEditing ? (
+              // Show dropdown when status is being edited
+              <Select
+                value={tempStatus || params.row.status}
+                onChange={(e) => setTempStatus(e.target.value)} // Temporary save to state
+                onBlur={() => handleStatusChange(tempStatus, params.row.id)} // Save to Firebase on blur
+                sx={{ width: '100%' }}
+                autoFocus // Autofocus when dropdown opens
+              >
+                {orderStatuses.map((status) => (
+                  <MenuItem key={status} value={status}>
+                    {status}
+                  </MenuItem>
+                ))}
+              </Select>
+            ) : (
+              // Show status as text and allow click-to-edit
+              <Typography
+                onClick={() => {
+                  setEditStatusId(params.row.id); // Set the row being edited
+                  setTempStatus(params.row.status); // Pre-fill the current status
+                }}
+                sx={{ cursor: 'pointer', color: 'inherit' }} // Remove the underline and color change
+              >
+                {params.row.status}
+              </Typography>
+            )}
+          </Box>
+        );
+      }
+    },
     { field: 'name', headerName: 'Name', flex: 2.5, headerAlign: 'center', align: 'center' },
     { field: 'address', headerName: 'Address', flex: 3, headerAlign: 'center', align: 'center' },
     { field: 'pincode', headerName: 'Pincode', flex: 1.5, headerAlign: 'center', align: 'center' },
