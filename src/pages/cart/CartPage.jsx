@@ -16,10 +16,12 @@ import {
 } from "../../redux/cartSlice";
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import emailjs from 'emailjs-com';
+import { useNavigate } from 'react-router-dom';
 
 const CartPage = () => {
     const cartItems = useSelector((state) => state.cart);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const deleteCart = (item) => {
         dispatch(deleteFromCart(item));
@@ -264,13 +266,20 @@ const CartPage = () => {
                                 </dl>
                                 <div className="px-2 pb-4 font-medium text-green-700">
                                     <div className="flex gap-4 mb-6">
-                                        {getAuth().currentUser
-                                            ? <BuyNowModal
+                                        {getAuth().currentUser ? (
+                                            <BuyNowModal
                                                 addressInfo={addressInfo}
                                                 setAddressInfo={setAddressInfo}
                                                 buyNowFunction={buyNowFunction}
-                                            /> : <Navigate to={'/login'} />
-                                        }
+                                            />
+                                        ) : (
+                                            <button
+                                                onClick={() => navigate('/login')}
+                                                className="w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                                            >
+                                                Login to Checkout
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
