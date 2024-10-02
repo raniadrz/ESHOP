@@ -16,34 +16,46 @@ import Layout from "../../components/layout/Layout";
 import myContext from "../../context/myContext";
 import { addToCart, deleteFromCart, incrementQuantity, decrementQuantity } from "../../redux/cartSlice";
 import Category from "../../components/category/Category";
+import dog1 from "./DogProfile.png";
+import dog2 from "./Dog.png";
+import cat1 from "./CatProfile.png";
+import cat2 from "./Cat.png";
+import bird1 from "./Bird.png";
+import bird2 from "./BirdProfile.png";
+import fish1 from "./FishProfile.png";
+import fish2 from "./Fish.png";
+import littlepet1 from "./LittlePetProfile.png";
+import littlepet2 from "./LittlePet.png";
+import reptile1 from "./ReptileProfile.png";
+import reptile2 from "./Reptile.png";
 
 // Create Hero Section Component
 const HeroSection = ({ category }) => {
     // Define hero images with valid categories
     const heroImages = {
         Dog: [
-            "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2023/07/top-20-small-dog-breeds.jpeg.jpg",
-            "https://topdoghealth.com/wp-content/uploads/top-10-nutrients-dogs-need-for-healthy-joints.png"
+            dog1,
+            dog2
         ],
         Cat: [
-            "https://static.vecteezy.com/system/resources/thumbnails/022/963/918/small_2x/ai-generative-cute-cat-isolated-on-solid-background-photo.jpg",
-            "https://static.vecteezy.com/system/resources/thumbnails/024/399/355/small_2x/three-cool-cats-in-sunglasses-illustration-ai-generative-free-photo.jpg"
+            cat1,
+            cat2
         ],
         Bird: [
-            "https://static.vecteezy.com/system/resources/previews/036/725/033/non_2x/ai-generated-singing-birds-musical-notes-and-blossoming-branches-set-a-harmonious-scene-free-photo.jpg",
-            "https://t4.ftcdn.net/jpg/07/54/80/09/360_F_754800963_sKRpASsdPJ2Jo076lfjOQZA4sDiizgsv.jpg"
+            bird1,
+            bird2
         ],
         Fish: [
-            "https://t4.ftcdn.net/jpg/02/53/61/69/360_F_253616948_za22DUrpvoM6aBDyPZxXDXf1OVNZFhL4.jpg",
-            "https://us.123rf.com/450wm/antos777/antos7771411/antos777141100042/34007339-zebrasoma-flavescens-yellow-tang-saltwater-fish.jpg?ver=6"
+           fish1,
+           fish2
         ],
         'Little Pet': [
-            "https://www.idausa.org/assets/components/phpthumbof/cache/blogmain-group-of-rabbits-2056157612-0922-source-shutterstock.abe80ebac597b762e0e0fbf0e85555c8.jpg",
-            "https://t4.ftcdn.net/jpg/08/38/25/19/360_F_838251998_IGj2uzSlwRZUfmu9oGvOqUfViSaAhKTY.jpg"
+            littlepet1,
+            littlepet2
         ],
         Reptile: [
-            "https://www.anywhere.com/img-a/flora-fauna/reptile/iguana-verde/green-iguana2.jpg?q=85&w=1280",
-            "https://d18lev1ok5leia.cloudfront.net/chesapeakebay/field-guide/rough-green-snake/_670xAUTO_crop_center-center_none/roughgreensnakefieldguide_thumb-01.jpg"
+            reptile1,
+            reptile2
         ]
     };
 
