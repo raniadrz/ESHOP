@@ -1,0 +1,212 @@
+/* Apply margin to all main sections */
+.section {
+  margin-top: 20px;  /* Top margin */
+  margin-bottom: 20px;  /* Bottom margin */
+}
+
+/* For specific sections */
+.hero-section {
+  padding: 60px 20px;
+  text-align: center;
+  position: relative;
+}
+
+.hero-content h1 {
+  font-size: 48px;
+  font-weight: bold;
+  max-width: 800px;
+  margin: 0 auto 20px;
+}
+
+.hero-content p {
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto 30px;
+}
+
+.get-started-btn {
+  background-color: #7B61FF;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.pet-showcase {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 50px;
+}
+
+.pet-card {
+  width: 250px;
+  height: 250px;
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.pet-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+}
+
+.pet-card.active {
+  background-color: #F3F0FF;
+  transform: scale(1.1);
+}
+
+.category-section {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.search-bar-section {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.testimonial-section {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.testimonial-header {
+  max-width: 600px;
+  margin: 0 auto 40px;
+}
+
+.testimonial-header h2 {
+  font-size: 36px;
+  margin-bottom: 16px;
+}
+
+.testimonial-header p {
+  color: #666;
+}
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.testimonial-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.testimonial-content {
+  padding: 20px;
+}
+
+.testimonial-content h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.testimonial-description {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.testimonial-price {
+  font-size: 24px;
+  font-weight: bold;
+  color: #7B61FF;
+  margin-bottom: 15px;
+}
+
+.buy-now-btn {
+  background-color: #7B61FF;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+}
+
+.buy-now-btn:hover {
+  background-color: #6548FF;
+}
+
+.product-card-section {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.features-section {
+  background-color: #F8F7FF;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  max-width: 1200px;
+  margin: 40px auto 0;
+}
+
+.feature-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.feature-icon.pink {
+  background-color: #FFE0F0;
+}
+
+/* Add more color variations for other feature icons */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Add hover effect for the button */
+.get-started-btn:hover {
+  background-color: #6548FF;
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Add active state for the button */
+.get-started-btn:active {
+  transform: translateY(0);
+}

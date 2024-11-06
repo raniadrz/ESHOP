@@ -1,0 +1,26 @@
+.privacy-policy-container {
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  h1, h2 {
+    color: #0c867e;
+  }
+  
+  p {
+    line-height: 1.5;
+  }
+  
+  ul {
+    margin-bottom: 10px;
+  }
+  
+  a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  

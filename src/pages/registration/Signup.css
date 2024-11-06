@@ -1,0 +1,198 @@
+/* General Styles */
+.signup-bg {
+    background-image: url('./petLogin.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Signup Form Segment */
+.signup-segment {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 600px;
+    width: 100%;
+}
+
+.signup-header {
+    color: #1e70bf;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.signup-step-group {
+    margin-bottom: 15px;
+    padding: 0;
+    font-size: 0.8em;
+}
+
+.signup-step {
+    padding: 5px;
+    color: #1e70bf;
+}
+
+.signup-step .title {
+    font-size: 0.9em;
+}
+
+.signup-step .description {
+    font-size: 0.75em;
+}
+
+.signup-form-input {
+    margin-bottom: 15px;
+}
+
+.signup-form-input input,
+.signup-form-input select {
+    border: 1px solid #d3e2f9;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1em;
+    width: 100%;
+}
+
+.signup-button-group {
+    margin-top: 15px;
+}
+
+.signup-button-group .ui.button.primary {
+    background-color: #1e70bf;
+    color: white;
+}
+
+.signup-button-group .ui.button.primary:hover {
+    background-color: #155a8a;
+}
+
+.signup-button-group .ui.button.secondary {
+    background-color: #f0f8ff;
+    color: #1e70bf;
+}
+
+.signup-button-group .ui.button.secondary:hover {
+    background-color: #e0f0ff;
+}
+
+.signup-divider {
+    margin-top: 25px;
+}
+
+.signup-footer {
+    text-align: center;
+}
+
+.signup-footer p {
+    margin-top: 20px;
+    color: #1e70bf;
+}
+
+.signup-footer a {
+    color: #1e70bf;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.signup-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Review segment */
+.review-segment {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.review-segment h3 {
+    color: #1e70bf;
+    text-align: center;
+}
+
+.review-segment p {
+    margin: 10px 0;
+}
+
+/* Error Message */
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+/* Responsive Styles */
+@media only screen and (max-width: 768px) {
+    .signup-segment {
+        padding: 20px;
+        max-width: 90%;
+    }
+
+    .signup-header {
+        font-size: 1.5em;
+    }
+
+    .signup-step .title {
+        font-size: 0.8em;
+    }
+
+    .signup-step .description {
+        font-size: 0.7em;
+    }
+
+    .signup-form-input input,
+    .signup-form-input select {
+        font-size: 0.9em;
+        padding: 8px;
+    }
+
+    .signup-button-group .ui.button.primary {
+        font-size: 0.9em;
+    }
+
+    .signup-button-group .ui.button.secondary {
+        font-size: 0.9em;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .signup-segment {
+        padding: 15px;
+        max-width: 100%;
+    }
+
+    .signup-header {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+    }
+
+    .signup-step-group {
+        font-size: 0.7em;
+    }
+
+    .signup-form-input input,
+    .signup-form-input select {
+        padding: 7px;
+        font-size: 0.85em;
+    }
+
+    .signup-button-group .ui.button.primary,
+    .signup-button-group .ui.button.secondary {
+        font-size: 0.85em;
+    }
+
+    .signup-divider {
+        margin-top: 15px;
+    }
+
+    .review-segment {
+        padding: 15px;
+    }
+}

@@ -1,0 +1,122 @@
+/* Navbar Title Styling */
+.navbar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Navbar Links for Desktop */
+.navbar-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: #666666;
+  padding: 8px 16px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.navbar-links a:hover {
+  color: #1B3654;
+  background-color: transparent;
+  transform: none;
+}
+
+/* Drawer Content */
+.drawer-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: #ffffff;
+}
+
+/* Profile Section in Drawer */
+.profile-section {
+  padding: 32px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-section .MuiAvatar-root {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 16px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.profile-section .MuiTypography-h6 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.profile-section .MuiTypography-body2 {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+/* Nav List Styling */
+.nav-list {
+  padding: 16px 8px;
+}
+
+.nav-list .MuiListItem-root {
+  margin: 8px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.nav-list .MuiListItem-root:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.nav-list .MuiListItemIcon-root {
+  min-width: 40px;
+}
+
+.nav-list .MuiListItemText-primary {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Divider Styling */
+.MuiDivider-root {
+  margin: 16px 0;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Scrollbar */
+.drawer-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.drawer-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.drawer-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+/* Add new styles */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-image {
+  height: 40px;
+  width: auto;
+}

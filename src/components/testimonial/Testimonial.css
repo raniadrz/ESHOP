@@ -1,0 +1,117 @@
+/* Background mix of orange and blue with gradient (top to bottom) */
+.testimonial-background {
+  background: linear-gradient(to bottom, #fffffe, #e3940c); /* Orange at the top, blue at the bottom */
+  padding: 50px 0; /* Add some padding around the section */
+  text-align: center;
+}
+
+/* Handwritten text effect */
+.handwritten-text {
+  font-family: 'Pacifico', cursive; /* Handwriting style font */
+  font-size: 1.5rem; /* Adjust the size as needed */
+  color: #120c0c; /* Dark text color for contrast */
+}
+
+/* Override MUI Button for submission */
+.custom-button {
+  background-color: #ff9800; /* Orange button */
+  color: #ffffff; /* White text */
+  transition: background-color 0.3s ease;
+}
+
+.custom-button:hover {
+  background-color: #f57c00; /* Darker orange on hover */
+}
+
+.custom-button:disabled {
+  background-color: #ffcc80; /* Light orange when disabled */
+}
+
+/* Handwritten effect for title */
+.handwritten-title {
+  font-family: 'Pacifico', cursive; /* Handwriting font for titles */
+  font-size: 3rem;
+  color: #ffffff;
+}
+
+/* Form box styling */
+.testimonial-form {
+  background-color: #fff; /* White background for the form */
+  border: 2px solid #ff9800; /* Orange border around the form */
+  padding: 20px; /* Add padding inside the form */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  width: 100%;
+  max-width: 600px; /* Limit the width on larger screens */
+  margin: 0 auto; /* Center the form */
+}
+
+.testimonial-form input, .testimonial-form textarea {
+  width: 100%; /* Full width for inputs and text areas */
+  margin-bottom: 1rem;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.testimonial-form textarea {
+  resize: none; /* Prevent resizing */
+}
+
+.testimonial-form label {
+  font-size: 1.1rem; /* Slightly larger label size */
+  color: #120c0c; /* Darker color for labels */
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.testimonial-section {
+    background-color: #fff;
+    padding: 80px 0;
+}
+
+.testimonial-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-4px);
+}
+
+.highlight-text {
+    background-color: #e8ffd1;
+    padding: 4px 12px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stats-label {
+    color: #666;
+    font-size: 0.875rem;
+}
+
+.trustpilot-button {
+    background-color: #e8ffd1;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.trustpilot-button:hover {
+    background-color: #d1ffb3;
+}
+
+@media (max-width: 768px) {
+    .stats-container {
+        flex-direction: column;
+        text-align: center;
+    }
+}

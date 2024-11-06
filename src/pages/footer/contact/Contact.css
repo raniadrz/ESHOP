@@ -1,0 +1,62 @@
+/* Contact.css */
+
+.Contact-hero {
+  width: 100%; /* Full width of the viewport */
+}
+
+.hero-image {
+  width: 100%; /* Ensure the image spans the full width */
+  height: auto; /* Maintain the aspect ratio */
+  object-fit: cover; /* Cover the container while maintaining aspect ratio */
+}
+
+.Contact-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Make container full width */
+  padding: 20px;
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+}
+
+.Contact-details {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.Contact-details h1,
+.Contact-details h2 {
+  margin-bottom: 10px;
+}
+
+.Contact-details a {
+  display: block;
+  margin-bottom: 10px;
+  color: #005689;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.Contact-map {
+  width: 80%; /* Adjust map image width */
+  max-width: 600px; /* Optional: limit max width */
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.map-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain; /* Maintain aspect ratio and fit inside the container */
+  margin-top: 20px; /* Add some margin for spacing */
+}
+
+.contact-info {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.contact-info p {
+  margin-bottom: 5px;
+}

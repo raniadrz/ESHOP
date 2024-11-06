@@ -1,0 +1,16 @@
+/* You can remove most of the existing CSS as we're using MUI's sx prop for styling */
+
+.MuiCard-root {
+    transition: transform 0.2s ease-in-out;
+}
+
+.MuiCard-root:hover {
+    transform: translateY(-4px);
+}
+
+/* Add responsive styles if needed */
+@media (max-width: 600px) {
+    .MuiContainer-root {
+        padding: 16px;
+    }
+}

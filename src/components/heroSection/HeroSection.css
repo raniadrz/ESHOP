@@ -1,0 +1,42 @@
+.hero-slider {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.slider-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensure the image covers the entire container */
+}
+
+.slick-dots {
+  bottom: 10px;
+}
+
+.slick-dots li button:before {
+  font-size: 10px;
+  color: #ffffff; /* Dot color */
+}
+
+.slick-dots li.slick-active button:before {
+  color: #ffcc00; /* Active dot color */
+}
+
+@media (max-width: 768px) {
+  .hero-image {
+    height: 60vh; /* Set a specific height for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-image {
+    height: 50vh; /* Further adjust the height for very small screens */
+  }
+}

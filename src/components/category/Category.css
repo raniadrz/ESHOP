@@ -1,0 +1,83 @@
+/* Hide scrollbar */
+.hide-scroll-bar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+  
+.hide-scroll-bar::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+}
+
+/* Make images oval and fit within their containers */
+.oval-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 100%;
+}
+
+/* Add spacing to push the categories down */
+.category-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 10px; /* Add padding to top and sides */
+    margin-top: 10px; /* Add margin to push categories down */
+}
+
+/* Adjustments for mobile screens */
+@media (max-width: 600px) {
+    .category-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .category-item {
+        margin-bottom: 1rem;
+    }
+
+    .category-circle {
+        width: 60px;
+        height: 60px;
+    }
+
+    .category-text {
+        font-size: 0.8rem;
+    }
+}
+
+/* Hover effect for category items */
+.category-circle {
+    background-color: #f0f0f0; /* Light background for the circle */
+    border-radius: 50%;
+    position: relative;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.category-circle:hover {
+    background-color: #1976d2; /* Highlight with blue on hover */
+    transform: scale(1.1); /* Slightly enlarge on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+/* General styles for category text */
+.category-text {
+    color: #333; /* Darker text color */
+    transition: color 0.3s ease;
+}
+
+.category-circle:hover .category-text {
+    color: #1976d2; /* Change text color to blue on hover */
+}
+
+/* Adjustments for larger screens */
+@media (min-width: 1024px) {
+    .category-circle {
+        width: 100px;
+        height: 100px;
+    }
+
+    .category-text {
+        font-size: 1rem;
+    }
+}
