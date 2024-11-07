@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-
+import logo from "../../../public/logo.png";
 const Footer = () => {
   return (
     <footer className="bg-white text-black py-16">
@@ -9,7 +9,7 @@ const Footer = () => {
           {/* Logo Section */}
           <div className="w-full md:w-1/4 mb-8 md:mb-0">
             <img 
-              src="../../../logo.png" 
+              src={logo} 
               alt="Pet Paradise  Logo" 
               className="w-32"
             />
