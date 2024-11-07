@@ -1,5 +1,9 @@
 import { Toaster } from "react-hot-toast";
 import 'semantic-ui-css/semantic.min.css';
+import { getAuth } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+import { getDoc, doc } from 'firebase/firestore';
+import { fireDB } from './firebase/FirebaseConfig';
 
 import {
   Route,
@@ -29,6 +33,25 @@ import { ProtectedRouteForAdmin } from "./protectedRoute/ProtectedRouteForAdmin"
 import { ProtectedRouteForUser } from "./protectedRoute/ProtectedRouteForUser";
 
 function App() {
+  const [userRole, setUserRole] = useState(null);
+  const auth = getAuth();
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // Get user role from Firestore
+        const userDoc = await getDoc(doc(fireDB, "user", user.uid));
+        if (userDoc.exists()) {
+          setUserRole(userDoc.data().role);
+        }
+      } else {
+        setUserRole(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <MyState>
       <Router>

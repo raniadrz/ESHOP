@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
-    Button, Card, CardContent, CardMedia, Grid, Typography, Container, Chip, CircularProgress, Box, IconButton, Dialog, DialogContent, DialogTitle, Slider, TextField, MenuItem, Pagination
+    Button, Card, CardContent, CardMedia, Grid, Typography, Container, Chip, CircularProgress, Box, IconButton, Pagination
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
-import FilterListIcon from '@mui/icons-material/FilterList';
 import StarIcon from '@mui/icons-material/Star';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import AddIcon from '@mui/icons-material/Add';
@@ -16,8 +15,8 @@ import Layout from "../../components/layout/Layout";
 import myContext from "../../context/myContext";
 import { addToCart, deleteFromCart, incrementQuantity, decrementQuantity } from "../../redux/cartSlice";
 import Category from "../../components/category/Category";
+// import Filter from "../../components/filter/filter";
 
-// Create Hero Section Component
 const CategoryPage = () => {
     const { categoryname } = useParams();
     const context = useContext(myContext);
@@ -27,48 +26,9 @@ const CategoryPage = () => {
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart);
 
-    // Filter state
-    const [priceRange, setPriceRange] = useState([0, 1000]);
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const [selectedCategory2, setSelectedCategory2] = useState("");
-    const [selectedSubcategory, setSelectedSubcategory] = useState("");
-    const [availableCategories, setAvailableCategories] = useState([]);
-    const [availableCategory2, setAvailableCategory2] = useState([]);
-    const [availableSubcategories, setAvailableSubcategories] = useState([]);
-    const [isFilterOpen, setIsFilterOpen] = useState(false); // State to manage filter popup visibility
-
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 12;
-
-    useEffect(() => {
-        // Populate filter options based on the available products
-        const categories = Array.from(new Set(getAllProduct.map(product => product.category)));
-        const categories2 = Array.from(new Set(getAllProduct.map(product => product.category2)));
-        const subcategories = Array.from(new Set(getAllProduct.map(product => product.subcategory)));
-
-        setAvailableCategories(categories);
-        setAvailableCategory2(categories2);
-        setAvailableSubcategories(subcategories);
-    }, [getAllProduct]);
-
-    // Filter products based on selected filters
-    useEffect(() => {
-        const filtered = getAllProduct.filter((product) => {
-            return (
-                product.category.includes(categoryname) &&
-                product.price >= priceRange[0] &&
-                product.price <= priceRange[1] &&
-                (!selectedCategory || product.category === selectedCategory) &&
-                (!selectedCategory2 || product.category2 === selectedCategory2) &&
-                (!selectedSubcategory || product.subcategory === selectedSubcategory)
-            );
-        });
-        setFilteredProducts(filtered);
-        setCurrentPage(1);  // Reset to first page after applying a new filter
-    }, [getAllProduct, categoryname, priceRange, selectedCategory, selectedCategory2, selectedSubcategory]);
-
-    const [filteredProducts, setFilteredProducts] = useState([]);
 
     const addCart = (item) => {
         const itemWithTime = { ...item, time: new Date().toISOString() };
@@ -93,178 +53,99 @@ const CategoryPage = () => {
         localStorage.setItem("cart", JSON.stringify(cartItems));
     }, [cartItems]);
 
-    // Helper function to find if an item is in the cart and return its quantity
     const findCartItem = (id) => {
         return cartItems.find((item) => item.id === id);
     };
 
-    const handleFilterOpen = () => {
-        setIsFilterOpen(true); // Open filter modal
-    };
-
-    const handleFilterClose = () => {
-        setIsFilterOpen(false); // Close filter modal
-    };
-
-    // Handle changes in the price range slider
-    const handlePriceChange = (event, newValue) => {
-        setPriceRange(newValue);
-    };
-
     // Calculate products to display for the current page
+    const categoryProducts = getAllProduct.filter(product => product.category.includes(categoryname));
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-
-    // Handle pagination
-    const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
-    };
-
-    const handlePreviousPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
+    const currentProducts = categoryProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(categoryProducts.length / productsPerPage);
 
     const handlePageChange = (event, page) => {
         setCurrentPage(page);
     };
 
-    const handleDirectPageInput = (event) => {
-        const pageNumber = parseInt(event.target.value, 10);
-        if (pageNumber >= 1 && pageNumber <= totalPages) {
-            setCurrentPage(pageNumber);
-        }
-    };
-
     return (
         <Layout>
             <Container maxWidth="lg" sx={{ textAlign: "center", mt: 4 }}>
-               
-                {/* Categories Section */}
                 <Category />
 
-                {/* Updated Typography with orange, bold font and margin-bottom for gap */}
-                <Typography 
-                    variant="h4" 
-                    gutterBottom 
-                    sx={{ 
-                        color: '#ff9800',  // Orange color
-                        fontWeight: 'bold',  // Bold font weight
-                        fontFamily: 'Arial, sans-serif',  // Custom font (you can change it to your preferred font)
-                        mb: 4  // Adds margin-bottom for a gap between the title and the grid
-                    }}
-                >
-                    {categoryname} Products
-                </Typography>
-
-                {/* Cloud-style Filter Button */}
-                <Button
-                    onClick={handleFilterOpen}
+                <Box
                     sx={{
-                        backgroundColor: '#f0f8ff',
-                        borderRadius: '50px',
-                        padding: '10px 30px',
-                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                        '&:hover': {
-                            backgroundColor: '#e6f0ff',
-                        },
+                        position: 'relative',
+                        mb: 6,
+                        mt: 4,
                         display: 'flex',
-                        alignItems: 'center',
-                        mb: 4
+                        flexDirection: 'column',
+                        alignItems: 'center'
                     }}
                 >
-                    <FilterListIcon sx={{ mr: 1 }} />
-                    <Typography variant="button" sx={{ fontWeight: 'bold' }}>
-                        Open Filters
+                    <Typography 
+                        variant="h3" 
+                        sx={{ 
+                            color: '#2c3e50',
+                            fontWeight: '700',
+                            textTransform: 'uppercase',
+                            position: 'relative',
+                            display: 'inline-block',
+                            padding: '0 15px',
+                            '&::before': {
+                                content: '""',
+                                position: 'absolute',
+                                left: '-20px',
+                                top: '50%',
+                                width: '40px',
+                                height: '2px',
+                                background: '#ff9800',
+                                transform: 'translateY(-50%)'
+                            },
+                            '&::after': {
+                                content: '""',
+                                position: 'absolute',
+                                right: '-20px',
+                                top: '50%',
+                                width: '40px',
+                                height: '2px',
+                                background: '#ff9800',
+                                transform: 'translateY(-50%)'
+                            }
+                        }}
+                    >
+                        {categoryname}
                     </Typography>
-                </Button>
-
-                {/* Filter Dialog (Popup) */}
-                <Dialog open={isFilterOpen} onClose={handleFilterClose} maxWidth="sm" fullWidth>
-                    <DialogTitle>Filter</DialogTitle>
-                    <DialogContent>
-                        <Box display="flex" flexDirection="column" gap={2} mb={4}>
-                            {/* Price Range */}
-                            <Box>
-                                <Typography variant="h6">Price Range: {`${priceRange[0]}€ - ${priceRange[1]}€`}</Typography>
-                                <Slider
-                                    value={priceRange}
-                                    onChange={handlePriceChange}
-                                    valueLabelDisplay="auto"
-                                    min={0}
-                                    max={1000}
-                                    sx={{ width: '100%' }}
-                                />
-                            </Box>
-
-                            {/* Category2 */}
-                            <Box>
-                                <Typography variant="h6">Category </Typography>
-                                <TextField
-                                    select
-                                    label="Select Category 2"
-                                    value={selectedCategory2}
-                                    onChange={(e) => setSelectedCategory2(e.target.value)}
-                                    fullWidth
-                                >
-                                    <MenuItem value="">All</MenuItem>
-                                    {availableCategory2.map((category2) => (
-                                        <MenuItem key={category2} value={category2}>
-                                            {category2}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            </Box>
-
-                            {/* Subcategory */}
-                            <Box>
-                                <Typography variant="h6">Sub Category</Typography>
-                                <TextField
-                                    select
-                                    label="Select Subcategory"
-                                    value={selectedSubcategory}
-                                    onChange={(e) => setSelectedSubcategory(e.target.value)}
-                                    fullWidth
-                                >
-                                    <MenuItem value="">All</MenuItem>
-                                    {availableSubcategories.map((subcategory) => (
-                                        <MenuItem key={subcategory} value={subcategory}>
-                                            {subcategory}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            </Box>
-                        </Box>
-
-                        {/* Close and Apply Buttons */}
-                        <Box display="flex" justifyContent="space-between" mt={2}>
-                            <Button onClick={handleFilterClose} variant="outlined">
-                                Close
-                            </Button>
-                            <Button onClick={handleFilterClose} variant="contained" color="primary">
-                                Apply Filters
-                            </Button>
-                        </Box>
-                    </DialogContent>
-                </Dialog>
+                    <Typography 
+                        variant="subtitle1" 
+                        sx={{ 
+                            color: '#7f8c8d',
+                            mt: 1,
+                            fontStyle: 'italic'
+                        }}
+                    >
+                        Explore our {categoryname.toLowerCase()} collection
+                    </Typography>
+                    <Box
+                        sx={{
+                            width: '60px',
+                            height: '3px',
+                            background: '#ff9800',
+                            margin: '15px auto',
+                            borderRadius: '2px'
+                        }}
+                    />
+                </Box>
 
                 {loading && <CircularProgress />}
-
                 <Grid 
                     container 
                     spacing={4} 
                     justifyContent="center"
                     sx={{ 
-                        background: 'linear-gradient(to bottom, #ffffff, #1976d2, #ffffff)', // Blue and white mix
-                        padding: '20px', // Add padding inside the grid
-                        borderRadius: '10px', // Adds a slight border-radius to the grid background
-                        mt: 4  // Adds margin-top to separate the grid from the title
+                        padding: '20px',
+                        borderRadius: '15px',
+                        mt: 4
                     }}
                 >
                     {currentProducts.map((item, index) => {
@@ -275,136 +156,248 @@ const CategoryPage = () => {
                             <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
                                 <Card
                                     sx={{
-                                        height: "100%",
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: "space-between",
+                                        height: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        position: 'relative',
+                                        transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+                                        borderRadius: '15px',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                        '&:hover': {
+                                            transform: 'translateY(-5px)',
+                                            boxShadow: '0 12px 20px rgba(0,0,0,0.15)',
+                                        }
                                     }}
                                     onClick={() => navigate(`/productinfo/${id}`)}
                                 >
+                                    {/* Product Type Badge */}
+                                    {productType && (
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                top: '10px',
+                                                right: '10px',
+                                                zIndex: 1
+                                            }}
+                                        >
+                                            {productType === "New Product" && (
+                                                <Chip
+                                                    label="New"
+                                                    color="success"
+                                                    icon={<StarIcon />}
+                                                    sx={{
+                                                        background: 'linear-gradient(45deg, #2ecc71, #27ae60)',
+                                                        color: 'white',
+                                                        fontWeight: 'bold'
+                                                    }}
+                                                />
+                                            )}
+                                            {productType === "Sales" && (
+                                                <Chip
+                                                    label="Sale"
+                                                    color="error"
+                                                    icon={<LocalOfferIcon />}
+                                                    sx={{
+                                                        background: 'linear-gradient(45deg, #e74c3c, #c0392b)',
+                                                        color: 'white',
+                                                        fontWeight: 'bold'
+                                                    }}
+                                                />
+                                            )}
+                                        </Box>
+                                    )}
+
+                                    {/* Image Container */}
                                     <Box
                                         sx={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            height: 200,
+                                            position: 'relative',
+                                            paddingTop: '75%', // 4:3 Aspect Ratio
+                                            background: '#f8f9fa',
+                                            overflow: 'hidden'
                                         }}
                                     >
                                         <CardMedia
                                             component="img"
                                             image={productImageUrl}
-                                            alt="product"
+                                            alt={title}
                                             sx={{
-                                                width: "auto",
-                                                maxHeight: "100%",
-                                                maxWidth: "100%",
-                                                objectFit: "contain",
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'contain',
+                                                padding: '10px',
+                                                transition: 'transform 0.3s ease-in-out',
+                                                '&:hover': {
+                                                    transform: 'scale(1.05)'
+                                                }
                                             }}
                                         />
                                     </Box>
-                                    <CardContent sx={{ flexGrow: 1 }}>
-                                        <Typography variant="h6" component="div">
+
+                                    {/* Content */}
+                                    <CardContent 
+                                        sx={{
+                                            flexGrow: 1,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 1,
+                                            padding: '16px'
+                                        }}
+                                    >
+                                        <Typography 
+                                            variant="h6" 
+                                            sx={{
+                                                fontSize: '1.1rem',
+                                                fontWeight: '600',
+                                                color: '#2c3e50',
+                                                mb: 1,
+                                                height: '2.4em',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical'
+                                            }}
+                                        >
                                             {title}
                                         </Typography>
-                                        <Typography variant="body2" color="textSecondary">
+
+                                        <Typography 
+                                            variant="body2" 
+                                            sx={{
+                                                color: '#7f8c8d',
+                                                fontSize: '0.875rem',
+                                                mb: 1
+                                            }}
+                                        >
                                             {category}, {category2}, {subcategory}
                                         </Typography>
-                                        <Typography variant="h6" color="textPrimary">
+
+                                        <Typography 
+                                            variant="h6" 
+                                            sx={{
+                                                color: '#e67e22',
+                                                fontWeight: 'bold',
+                                                fontSize: '1.25rem',
+                                                mb: 2
+                                            }}
+                                        >
                                             {price}€
                                         </Typography>
-                                        {productType === "New Product" && (
-                                            <Chip
-                                                label="New"
-                                                color="success"
-                                                icon={<StarIcon />}
-                                                sx={{ mt: 1 }}
-                                            />
-                                        )}
-                                        {productType === "Sales" && (
-                                            <Chip
-                                                label="Sale"
-                                                color="error"
-                                                icon={<LocalOfferIcon />}
-                                                sx={{ mt: 1 }}
-                                            />
-                                        )}
-                                    </CardContent>
 
-                                    <Box sx={{ p: 2 }}>
-                                        {cartItem ? (
-                                            <Box
-                                                display="flex"
-                                                flexDirection="column"
-                                                justifyContent="center"
-                                                alignItems="center"
-                                                gap={1}
-                                            >
+                                        {/* Cart Controls */}
+                                        <Box sx={{ mt: 'auto', p: 2 }}>
+                                            {cartItem ? (
                                                 <Box
-                                                    display="flex"
-                                                    justifyContent="space-between"
-                                                    alignItems="center"
+                                                    sx={{
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        gap: 1
+                                                    }}
                                                 >
-                                                    <IconButton
+                                                    <Box
+                                                        sx={{
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            alignItems: 'center',
+                                                            gap: 1,
+                                                            background: '#f8f9fa',
+                                                            borderRadius: '8px',
+                                                            padding: '4px'
+                                                        }}
+                                                    >
+                                                        <IconButton
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                decreaseQuantity(id);
+                                                            }}
+                                                            size="small"
+                                                            disabled={cartItem.quantity <= 1}
+                                                            sx={{
+                                                                color: '#e67e22',
+                                                                '&:hover': {
+                                                                    background: '#fff3e0'
+                                                                }
+                                                            }}
+                                                        >
+                                                            <RemoveIcon />
+                                                        </IconButton>
+                                                        <Typography
+                                                            variant="body1"
+                                                            sx={{
+                                                                fontWeight: 'bold',
+                                                                color: '#2c3e50'
+                                                            }}
+                                                        >
+                                                            {cartItem.quantity}
+                                                        </Typography>
+                                                        <IconButton
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                increaseQuantity(id);
+                                                            }}
+                                                            size="small"
+                                                            sx={{
+                                                                color: '#e67e22',
+                                                                '&:hover': {
+                                                                    background: '#fff3e0'
+                                                                }
+                                                            }}
+                                                        >
+                                                            <AddIcon />
+                                                        </IconButton>
+                                                    </Box>
+                                                    <Button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            decreaseQuantity(id);
+                                                            deleteCart(item);
                                                         }}
-                                                        size="small"
-                                                        disabled={cartItem.quantity <= 1}
-                                                    >
-                                                        <RemoveIcon />
-                                                    </IconButton>
-                                                    <Typography
-                                                        variant="body1"
-                                                        sx={{ mx: 2 }}
-                                                    >
-                                                        {cartItem.quantity}
-                                                    </Typography>
-                                                    <IconButton
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            increaseQuantity(id);
+                                                        variant="outlined"
+                                                        color="error"
+                                                        startIcon={<DeleteIcon />}
+                                                        fullWidth
+                                                        sx={{
+                                                            borderRadius: '8px',
+                                                            textTransform: 'none',
+                                                            fontWeight: '600'
                                                         }}
-                                                        size="small"
                                                     >
-                                                        <AddIcon />
-                                                    </IconButton>
+                                                        Remove
+                                                    </Button>
                                                 </Box>
+                                            ) : (
                                                 <Button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        deleteCart(item);
+                                                        addCart(item);
                                                     }}
-                                                    variant="outlined"
-                                                    color="error"
-                                                    startIcon={<DeleteIcon />}
+                                                    variant="contained"
+                                                    startIcon={<ShoppingCartIcon />}
                                                     fullWidth
+                                                    sx={{
+                                                        background: 'linear-gradient(45deg, #e67e22, #f39c12)',
+                                                        borderRadius: '8px',
+                                                        textTransform: 'none',
+                                                        fontWeight: '600',
+                                                        '&:hover': {
+                                                            background: 'linear-gradient(45deg, #d35400, #e67e22)'
+                                                        }
+                                                    }}
                                                 >
-                                                    Delete From Cart
+                                                    Add to Cart
                                                 </Button>
-                                            </Box>
-                                        ) : (
-                                            <Button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    addCart(item);
-                                                }}
-                                                variant="outlined"
-                                                color="primary"
-                                                startIcon={<ShoppingCartIcon />}
-                                                fullWidth
-                                            >
-                                                Add To Cart
-                                            </Button>
-                                        )}
-                                    </Box>
+                                            )}
+                                        </Box>
+                                    </CardContent>
                                 </Card>
                             </Grid>
                         );
                     })}
                 </Grid>
 
-                {/* Jump to Specific Page */}
                 <Box display="flex" justifyContent="center" alignItems="center" mt={4}>
                     <Pagination
                         count={totalPages}

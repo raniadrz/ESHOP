@@ -1,5 +1,3 @@
-
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'; // Import cart icon
 import StarIcon from '@mui/icons-material/Star';
 import { Box, Card, CardContent, CardMedia, Container, Grid, IconButton, Typography } from "@mui/material";
@@ -13,10 +11,13 @@ import Layout from "../../components/layout/Layout";
 import myContext from "../../context/myContext";
 import { addToCart, deleteFromCart } from '../../redux/cartSlice';
 import "./HomePageProductCard.css";
+import { getAuth } from 'firebase/auth';
 
 const HomePageProductCard = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const auth = getAuth();
+    const user = auth.currentUser;
 
     const context = useContext(myContext);
     const { loading, getAllProduct } = context;
@@ -110,19 +111,6 @@ const HomePageProductCard = () => {
                                     }
                                 }}
                             >
-                                {/* Favorite Icon */}
-                                <IconButton 
-                                    sx={{ 
-                                        position: 'absolute', 
-                                        right: 8, 
-                                        top: 8,
-                                        bgcolor: 'white',
-                                        '&:hover': { bgcolor: 'white' }
-                                    }}
-                                >
-                                    <FavoriteBorderIcon />
-                                </IconButton>
-
                                 <CardMedia
                                     component="img"
                                     image={productImageUrl}

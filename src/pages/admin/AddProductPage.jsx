@@ -1,5 +1,4 @@
 import { addDoc, collection, Timestamp } from "firebase/firestore";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import React, { useContext, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
@@ -175,7 +174,7 @@ const subcategoryList = {
   ],
   "Ενυδρεία": [
     "Γυάλες",
-    "Φυτά & Διακοσμητικά",
+    "Φυτά & ιακοσμητικά",
   ],
   "Αξεσουάρ": [
     "Φίλτρα",
@@ -229,8 +228,6 @@ const AddProductPage = () => {
     status: true,
   });
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
   const [step, setStep] = useState(1); // Track current step
 
   useEffect(() => {
@@ -241,19 +238,6 @@ const AddProductPage = () => {
       }));
     }
   }, [product.category]);
-
-  const handleImageFileChange = (e) => {
-    const file = e.target.files[0];
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-  };
-
-  const uploadImageToFirebase = async (file) => {
-    const storage = getStorage();
-    const storageRef = ref(storage, `product-images/${file.name}`);
-    await uploadBytes(storageRef, file);
-    return getDownloadURL(storageRef);
-  };
 
   const isValidProduct = (product) => {
     return (
@@ -294,11 +278,7 @@ const AddProductPage = () => {
 
     setLoading(true);
     try {
-      let imageUrl = product.productImageUrl;
-      if (imageFile) {
-        imageUrl = await uploadImageToFirebase(imageFile);
-      }
-      const productData = { ...product, productImageUrl: imageUrl };
+      const productData = { ...product };
       const productRef = collection(fireDB, "products");
       await addDoc(productRef, productData);
       showCustomToast('success', 'Product added successfully');
@@ -512,13 +492,26 @@ const AddProductPage = () => {
               />
               <Form.Input
                 fluid
-                label="Upload Image"
-                type="file"
-                onChange={handleImageFileChange}
+                label="Image URL"
+                placeholder="Enter the URL of your product image"
+                value={product.productImageUrl}
+                onChange={(e) =>
+                  setProduct({ ...product, productImageUrl: e.target.value })
+                }
               />
-              {imagePreview && (
+              {product.productImageUrl && (
                 <Segment>
-                  <Image src={imagePreview} size="small" rounded centered />
+                  <Image 
+                    src={product.productImageUrl} 
+                    size="small" 
+                    rounded 
+                    centered 
+                    onError={(e) => {
+                      e.target.onerror = null; // Prevent infinite loop
+                      showCustomToast('error', 'Invalid image URL');
+                      e.target.src = 'https://via.placeholder.com/150?text=No+Image'; // Fallback image
+                    }}
+                  />
                 </Segment>
               )}
               <Form.Group inline>
@@ -561,7 +554,7 @@ const AddProductPage = () => {
               <p><strong>Subcategory:</strong> {product.category2}</p>
               <p><strong>Sub-subcategory:</strong> {product.subcategory}</p>
               <p><strong>Description:</strong> {product.description}</p>
-              {imagePreview && <Image src={imagePreview} size="small" rounded centered />}
+              {product.productImageUrl && <Image src={product.productImageUrl} size="small" rounded centered />}
               <Button.Group fluid>
                 <Button onClick={prevStep} secondary>
                   Back
